@@ -1,0 +1,214 @@
+<!--#set(String manageHost =  request.getScheme()+"://"+request.serverName+":"+"a".valueOf(request.serverPort)+request.getContextPath())-->
+<!--#set(Map<String, Object> pageInfo)-->
+<!--#set(Long totalPage = pageInfo.totalPage)  -->
+<!--#set(int pages = pageInfo.pages.toInt())  -->
+<!--#set(int pageNum = pageInfo.pageNum.toInt())  -->
+<!-- 引入公共头部样式部分 -->
+${include("../public_header.httl")}
+
+<body class="skin-blue">
+	<!-- header logo: style can be found in header.less -->
+	<header class="header"> </header>
+	<div class="wrapper row-offcanvas row-offcanvas-left">
+		<!-- Left side column. contains the logo and sidebar -->
+		<!-- Right side column. Contains the navbar and content of the page -->
+		<aside class="right-side" style="margin-left: 0px">
+			<!-- Content Header (Page header) -->
+			<section class="content-header ovcl">
+				<ol class="breadcrumb">
+					<li><a href="${manageHost}/index.htm"><i
+							class="fa fa-dashboard"></i> 首页</a></li>
+					<li><a href="javascript:void(0);">系统管理</a></li>
+					<li><a href="${manageHost}/sysrole/sysRoleList.htm">后台角色管理</a></li>
+					<li class="active">后台角色列表</li>
+				</ol>
+			</section>
+
+			<!-- Main content -->
+			<section class="content">
+				<!-- 操作组 -->
+				<form class="uc_cs_form" id="pageForm"
+					action="${manageHost}/sysrole/sysRoleList.htm" method="get"
+					class="form-horizontal">
+					<input type="hidden" id="pageNo" name="pageNo" value="<!--#if("
+						" == request.getParameter("pageNo"))-->${request.getParameter("pageNo")}
+					<!--#else-->
+					1
+					<!--#end-->
+					"/>
+					<div class="oper-group">
+						<span>关键字：</span>
+						<div class="input-search input-group">
+							<input type="text" placeholder="角色名，描述" style=""
+								class="form-control input-sm" name="keyword" value="${keyword}">
+						</div>
+						<button class="btn btn-info btn-sm ml20">检索</button>
+					</div>
+				</form>
+				<!-- /操作组 -->
+				<div class="content-table-title">
+					<i class="fa fa-pencil"></i> 后台角色信息一览<button class="btn btn-info btn-sm ml20" onclick="sysRoleAdd()">新增后台角色</button>
+				</div>
+				
+				<!-- 列表 -->
+				<table class="table table-bordered table-hover define-name-table">
+					<thead>
+						<tr>
+							<th>编号</th>
+							<th>角色名</th>
+							<th>角色描述</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						<!--#if(pageInfo.result)-->
+						<!--#for(SysRoleDto sysrole : pageInfo.result)-->
+						<tr id="${sysrole.id}">
+							<td>${for.index+1}</td>
+							<td name="role">${sysrole.role}</td>
+							<td name="description">${sysrole.description}</td>
+							<td><a href="javascript:void(0);"
+								onclick="sysRoleUpdate('${sysrole.id}')">更新</a> <a
+								href="javascript:void(0);"
+								onclick="editRoleMenuBtn('${sysrole.id}','${sysrole.description}')"
+								style="margin-left: 3px">分配菜单</a></td>
+						</tr>
+						<!-- #end -->
+						<!--#else -->
+						<tr>
+							<td colspan="6" align="center"><font color="red">查找不到角色记录</font></td>
+						</tr>
+						<!--#end-->
+					</tbody>
+				</table>
+				<!-- /列表 -->
+
+				<!-- 分页 -->
+				<div class="dataTables_paginate paging_bootstrap fl">
+					<input type="hidden" id="totalPage" value="${totalPage}"></input>
+
+					<ul class="pagination">
+						<li class="prev">
+							<!--#if(pageNum>1)--> <a
+							href="javascript:complaintFormPage(${pageNum-1});">上一页</a> <!--#else -->
+							<!--  <a href="javascript:void(0);">上一页</a> --> <!-- #end -->
+						</li>
+
+
+						<!--#for(Integer userInfoPageNo : getSlider(10,pageNum,pages))-->
+						<li
+							<!--#if(userInfoPageNo == pageNum)-->class="active"<!--#end-->> <a
+							href="javascript:complaintFormPage(${userInfoPageNo});">${userInfoPageNo}</a></li>
+						<!--#end-->
+
+
+						<li class="next">
+							<!--#if(pageNum<pages)--> <a
+							href="javascript:complaintFormPage(${pageNum+1});">下一页</a> <!--#else -->
+							<!--  <a href="javascript:void(0);">下一页</a> --> <!-- #end -->
+						</li>
+					</ul>
+				</div>
+				<div class="fl page-go">
+					当前第 ${pageNum} 页 总记录数为 ${totalPage}条 <span class="ml20">跳转到第
+						<input id="goPage" value="${pageNum}" class="integer" />页 <a
+						href="javascript:complaintFormGoPage();"
+						class="btn btn-info btn-sm ml20">GO</a>
+				</div>
+				<!-- /分页 -->
+			</section>
+			<!-- /.content -->
+		</aside>
+		<!-- /.right-side -->
+	</div>
+	<!-- ./wrapper -->
+
+
+	<!-- 后台用户信息模态框 -->
+	<div class="modal fade" id="sysRoleModal" tabindex="-1" role="dialog"
+		aria-labelledby="sysRoleModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="sysRoleModalLabel">角色信息</h4>
+				</div>
+				<div class="modal-body">
+					<form id="sysRoleForm"
+						action="${manageHost}/sysrole/sysRoleAdd.html" method="post">
+						<div class="form-group">
+							<label for="role" class="control-label">* 角色:</label> <input
+								type="text" class="form-control" id="role" name="role" required>
+						</div>
+						<div class="form-group">
+							<label for="description" class="control-label">角色描述:</label> <input
+								type="text" class="form-control" id=description
+								name="description">
+						</div>
+						<input type="hidden" name="available" value="true" />
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+					<button type="button" class="btn btn-primary"
+						onclick="sysRoleFormSubmit()">提交</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 后台用户权限模态框 -->
+	<div class="modal fade" id="sysRoleMenuModal" tabindex="-1"
+		role="dialog" aria-labelledby="sysRoleMenuModalLabel"
+		aria-hidden="true">
+		<div class="modal-dialog" >
+			<div class="modal-content">
+
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="sysUserRoleModalLabel"
+						style="font-weight: bold;">角色菜单</h4>
+				</div>
+				<div class="modal-body"
+					style="height: 490px; overflow-y: auto; padding: 0px">
+
+					<div
+						style="margin: 0 0 15 15; padding-left: 15px; padding-top: 15px;">
+						<span style="font-weight: bold;">角色名：</span><span
+							id="edit-rolename"> </span>
+					</div>
+					<div style="padding-left: 30px; margin-bottom: 20px;">
+						<span style="font-weight: bold;">选择该角色可访问的菜单：</span>
+					</div>
+
+					<form id="sysRoleMenuForm" action="#" method="post"
+						class="form-inline" style="padding-left: 15px"></form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary"
+						onclick="sysRoleMenuFormSubmit()">保存</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 引用公共底部样式部分 -->
+	${include("../public_footer.httl")}
+	<script type="text/javascript" src="${manageHost}/components/sysuser/sysRoleList.js"></script>
+	<script>
+	window.onload = function() {
+		window.parent.$("#waiting").hide();
+	}
+	</script>
+
+	
+
+</body>

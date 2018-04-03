@@ -1,0 +1,215 @@
+<!--#set(String manageHost =  request.getScheme()+"://"+request.serverName+":"+"a".valueOf(request.serverPort)+request.getContextPath())-->
+<!--#set(List<SysMenuDto> menuList)  -->
+
+<!-- 引入公共头部样式部分 -->
+${include("../public_header.httl")}
+<style>
+.form-line {
+	margin-bottom: 10px;
+	height: 35px;
+}
+
+.checkbox-inline {
+	padding-left: 0px;
+}
+</style>
+<body class="skin-blue">
+	<div class="wrapper row-offcanvas row-offcanvas-left">
+		<aside class="right-side" style="margin-left: 0px">
+			<section class="content-header ovcl">
+				<ol class="breadcrumb">
+				    <li><a ><i class="fa fa-dashboard"></i> 首页</a></li>
+                    <li><a href="javascript:void(0);">系统管理</a></li>
+                    <li><a href="${manageHost}/menuManageNew/findAllMenu.htm" >菜单管理</a></li>
+                    <li class="active">菜单列表</li>
+                    
+				</ol>
+			</section>
+
+			<section class="content">
+
+				<div class="content-table-title">
+					<i class="fa fa-pencil"></i> 菜单一览
+					<button class="btn btn-default" onclick="infoAdd()">新增</button>
+				</div>
+				
+				<div id="menu_div">
+					<!-- #if(menuList) -->
+					<ul class="list-group">
+						<!-- #for(SysMenuDto menu : menuList) -->
+							<!-- #if(menu.name != 'ROOT') -->
+								<!-- #if(menu.menuType == "1") -->
+									<li class="list-group-item" id="${menu.id}"
+										isShow="${menu.isShow}"
+										icon="${menu.icon}"
+										name="${menu.name}"
+										parentId="${menu.parentId}"
+										zIndex="${menu.zIndex}"
+										url="${menu.url}"
+										sequence="${menu.sequence}"
+										menuType="${menu.menuType}"><strong>${menu.sequence}:${menu.name}</strong>
+										
+										<!-- #if(menu.name != '系统管理') -->
+											<!-- <a class="btn btn-default"  href="${manageHost}/menuManageNew/deleteMenu.htm?id=${menu.id}">删除</a> -->
+											<a class="btn btn-default"  href="#top" onclick="infoUpdate('${menu.id}')"><span class="glyphicon glyphicon-tags"></a>
+										<!-- #end -->
+									</li>
+								<!-- #else -->
+									<li class="list-group-item" id="${menu.id}".
+										isShow="${menu.isShow}"
+										name="${menu.name}"
+										parentId="${menu.parentId}"
+										permission="${menu.permission}"
+										zIndex="${menu.zIndex}"
+										url="${menu.url}"
+										sequence="${menu.sequence}"
+										menuType="${menu.menuType}"><!-- #if(menu.menuType == "2") -->
+																		${menu.sequence}
+																	<!-- #else(menu.menuType == "3") -->
+																		接口
+																	<!-- #else -->
+																		api
+																	<!-- #end -->: ${menu.name}
+																	[<label style="color: #3C8DBC">${menu.permission}</label>]
+										<a href="#top" class="btn btn-default"  onclick="infoUpdate('${menu.id}')"><span class="glyphicon glyphicon-tags"></span></a>
+										<!-- <a href="${manageHost}/menuManageNew/deleteMenu?id=${menu.id}" class="btn btn-default" >删除</a> -->
+									</li>
+								<!-- #end -->
+							<!-- #end -->
+						<!-- #end -->
+					</ul>
+					<!-- #else -->
+						menu不存在
+					<!-- #end -->
+				</div>
+			</section>
+			<!-- /.content -->
+		</aside>
+		<!-- /.right-side -->
+	</div>
+	<!-- ./wrapper -->
+
+	<!-- 对话框：编辑**-->
+	<div class="modal fade" id="editDialog" data-backdrop="false"
+		data-dialog-name="dialog-imagePrice" role="dialog"
+		aria-labelledby="modalLabel" aria-hidden="true" title="新增">
+		<div class="modal-dialog ">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="infoModalLabel">新增</h4>
+				</div>
+				<form class="form-horizontal bootstrap-form" role="form"
+					id="menuForm" action="${manageHost}/menuManageNew/editMenu.htm" method="post">
+					
+					<input type="hidden" name="id" class="form-text">
+
+					<div class="form-group">
+						<label class="col-sm-3 control-label">名称：</label> <input
+							type="text" class="form-control form-text" name="name">
+					</div>
+					
+					<div id="addType" class="form-group" style="margin-top: 22px; margin-bottom: 22px">
+						<label class="col-sm-3 control-label">类型：</label> 
+						<select class="form-control" onclick="changeFolder()"  name="menuType">
+							<option value="1">文件夹</option>
+							<option value="2">页面</option>
+							<option value="3">接口</option>
+							<option value="4">api</option>
+						</select>
+					</div>
+					<div id="isShowDiv" class="form-group" style="margin-top: 22px; margin-bottom: 22px">
+						<label class="col-sm-3 control-label">状态：</label> 
+						<select class="form-control" name="isShow">
+							<option value="true">显示</option>
+							<option value="false">隐藏</option>
+						</select>
+					</div>
+					
+					<div id="updateType" class="form-group" style="margin-top: 22px; margin-bottom: 22px">
+						<label class="col-sm-3 control-label">页面类型：</label>
+						<label id="type" class="control-label"></label>
+					</div>
+					
+					<div class="form-group">
+						<label class="col-sm-3 control-label">上级菜单：</label> 
+						<select class=" form-control" name="parentId" id="parentId">
+							<!-- #for(SysMenuDto menu : menuList) -->
+								<!-- #if(menu.menuType == "1") -->
+									<option value="${menu.id}">${menu.name}</option>
+								<!-- #end -->
+							<!-- #end -->
+						</select>
+					</div>
+					
+					<div class="form-group" id="sequenceDiv">
+						<label class="col-sm-3 control-label">排序：</label> <input
+							type="text" class="form-control form-text" name="sequence" placeholder="同级的排序，数值越小越靠前">
+					</div>
+					
+					<div id="icon" class="form-group">
+						<label class="col-sm-3 control-label">菜单图标：</label> 
+						<select class=" form-control" name="icon" style="display: inline;" onchange="changIconSelect(this);">
+							<option value="fa-bar-chart-o">fa-bar-chart-o</option>
+							<option value="fa-laptop">fa-laptop</option>
+							<option value="fa-edit">fa-edit</option>
+							<option value="fa-table">fa-table</option>
+							<option value="fa-calendar">fa-calendar</option>
+							<option value="fa-folder">fa-folder</option>
+							<option value="fa-book">fa-book</option>
+							<option value="fa-bomb">fa-bomb</option>
+							<option value="fa-building-o">fa-building-o</option>
+							<option value="fa-bookmark-o">fa-bookmark-o</option>
+							<option value="fa-bolt">fa-bolt</option>
+							<option value="fa-arrows-h">fa-arrows-h</option>
+							<option value="fa-adjust">fa-adjust</option>
+							<option value="fa-camera-retro">fa-camera-retro</option>
+							<option value="fa-clock-o">fa-clock-o</option>
+							<option value="fa-home">fa-home</option>
+							<option value="fa-road">fa-road</option>
+							<option value="fa-inbox">fa-inbox</option>
+							<option value="fa-play-circle-o">fa-play-circle-o</option>
+							<option value="fa-print">fa-print</option>
+						</select>
+						<i id="icon-show" class="fa fa-bar-chart-o"></i>
+					</div>
+					
+					<div id="page-menu">
+
+						<div class="form-group">
+							<label class="col-sm-3 control-label">菜单url：</label> <input
+								type="text" class="form-control form-text" name="url"  >
+						</div>
+
+						<div class="form-group">
+							<label class="col-sm-3 control-label">权限名称：</label> <input
+								type="text" class="form-control form-text" name="permission">
+						</div>
+
+					</div>
+
+					<div class="form-end-button">
+						<button type="button" onclick="menuFormSubmit();"
+							class="btn btn-default btn-sm">
+							<i class="fa fa-check"></i> 确定
+						</button>
+						<button type="button" class="btn btn-default btn-sm dialog-close"
+							data-dismiss="modal" onclick="menuFormclose();">
+							<i class="fa fa-times"></i> 取消
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<!-- /对话框：添加** -->
+	<!-- 引用公共底部样式部分 -->
+	${include("../public_footer.httl")}
+
+	<script type="text/javascript" src="${manageHost}/components/sysuser/sysRoleList.js"></script>
+	<script type="text/javascript" src="${manageHost}/components/sysuser/menuList.js"></script>
+	
+</body>

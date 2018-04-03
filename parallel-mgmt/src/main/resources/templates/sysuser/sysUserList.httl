@@ -1,0 +1,557 @@
+<!--#set(String manageHost =  request.getScheme()+"://"+request.serverName+":"+"a".valueOf(request.serverPort)+request.getContextPath())-->
+<!--#set(Map<String, Object> pageInfo)-->
+<!--#set(Long totalPage = pageInfo.totalPage)  -->
+<!--#set(int pages = pageInfo.pages.toInt())  -->
+<!--#set(int pageNum = pageInfo.pageNum.toInt())  -->
+
+<!-- 引入公共头部样式部分 -->
+${include("../public_header.httl")}
+
+<style>
+    label {
+        font-weight: normal;
+    }
+</style>
+
+<body class="skin-blue">
+
+<!-- header logo: style can be found in header.less -->
+<header class="header"></header>
+
+<div class="wrapper row-offcanvas row-offcanvas-left">
+    <!-- Left side column. contains the logo and sidebar -->
+    <!-- Right side column. Contains the navbar and content of the page -->
+    <aside class="right-side" style="margin-left: 0px">
+        <!-- Content Header (Page header) -->
+        <section class="content-header ovcl">
+            <ol class="breadcrumb">
+                <li><a><i class="fa fa-dashboard"></i> 首页</a></li>
+                <li><a href="javascript:void(0);">系统管理</a></li>
+                <li><a href="${manageHost}/sysuser/sysUserList.htm">后台用户管理</a></li>
+                <li class="active">后台用户列表</li>
+            </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+            <!-- 操作组 -->
+            <form class="uc_cs_form" id="pageForm"
+                  action="${manageHost}/sysuser/sysUserList.htm" method="get"
+                  class="form-horizontal">
+                <input type="hidden" id="pageNo" name="pageNo" value="<!--#if("
+                " == request.getParameter("pageNo"))-->${request.getParameter("pageNo")}
+                <!--#else-->
+                1
+                <!--#end-->
+                "/>
+                <div class="oper-group">
+                    <span>关键字：</span>
+                    <div class="input-search input-group">
+                        <input type="text" placeholder="姓名，邮箱" style=""
+                               class="form-control input-sm" name="keyword" value="${keyword}">
+                    </div>
+                    <button class="btn btn-info btn-sm ml20">检索</button>
+                </div>
+            </form>
+            <!-- /操作组 -->
+            <div class="content-table-title">
+                <i class="fa fa-pencil"></i> 后台用户信息一览
+                <button class="btn btn-info btn-sm ml20" data-toggle="modal"
+                        data-target="#sysUserModal">新增后台用户
+                </button>
+            </div>
+            <!-- 列表 -->
+            <table class="table table-bordered table-hover define-name-table">
+                <thead>
+                <tr>
+                    <th>编号</th>
+                    <th>用户名</th>
+                    <th>用户类型</th>
+                    <th>是否锁定</th>
+                    <th width="20%">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!--#if(pageInfo.result)-->
+                <!--#for(SysUserDto userinfo : pageInfo.result)-->
+                <!--#set(Integer userType = userinfo.userType)-->
+                <tr id="${userinfo.id}">
+                    <td>${for.index+1}</td>
+                    <td name="username">${userinfo.username}</td>
+                    <td name="userType"><!-- #if(userType==1) -->影像处理中心用户<!-- #else -->遥感集市用户<!-- #end --></td>
+                    <td name="locked">${userinfo.locked}</td>
+                    <td><a href="javascript:void(0);"
+                           onclick="sysUserUpdate('${userinfo.id}')">更新</a>
+                        <!--#if(userinfo.username.equals("admin")) -->
+                        <a href="javascript:void(0);" onclick="#')">删除</a> <!-- #else -->
+                        <a href="javascript:void(0);"
+                           onclick="sysUserDel('${userinfo.id}')">删除</a> <!-- #end --> <a
+                                href="javascript:void(0);"
+                                onclick="editUserRoleBtn('${userinfo.username}','${userinfo.userType}')">编辑角色</a>
+                        <!-- #if(userType==1) --><a href="javascript:void(0);"
+                                                    onclick="editUserPassword('${userinfo.id}','${userinfo.username}')">重置密码</a>
+                        <!-- #end -->
+
+                    </td>
+                </tr>
+                <!-- #end -->
+                <!--#else -->
+                <tr>
+                    <td colspan="6" align="center"><font color="red">查找不到用户记录</font></td>
+                </tr>
+                <!--#end-->
+                </tbody>
+            </table>
+            <!-- /列表 -->
+
+            <!-- 分页 -->
+            <div class="dataTables_paginate paging_bootstrap fl">
+                <input type="hidden" id="totalPage" value="${totalPage}"></input>
+
+                <ul class="pagination">
+                    <li class="prev">
+                        <!--#if(pageNum>1)--> <a
+                            href="javascript:complaintFormPage(${pageNum-1});">上一页</a> <!--#else -->
+                        <!--  <a href="javascript:void(0);">上一页</a> --> <!-- #end -->
+                    </li>
+
+
+                    <!--#for(Integer userInfoPageNo : getSlider(10,pageNum,pages))-->
+                    <li
+                    <!--#if(userInfoPageNo == pageNum)-->class="active"<!--#end-->> <a
+                        href="javascript:complaintFormPage(${userInfoPageNo});">${userInfoPageNo}</a></li>
+                    <!--#end-->
+
+
+                    <li class="next">
+                        <!--#if(pageNum<pages)--> <a
+                            href="javascript:complaintFormPage(${pageNum+1});">下一页</a> <!--#else -->
+                        <!--  <a href="javascript:void(0);">下一页</a> --> <!-- #end -->
+                    </li>
+                </ul>
+            </div>
+            <div class="fl page-go">
+                当前第 ${pageNum} 页 总记录数为 ${totalPage}条 <span class="ml20">跳转到第
+						<input id="goPage" value="${pageNum}" class="integer"/>页 <a
+                        href="javascript:complaintFormGoPage();"
+                        class="btn btn-info btn-sm ml20">GO</a>
+            </div>
+            <!-- /分页 -->
+        </section>
+        <!-- /.content -->
+    </aside>
+    <!-- /.right-side -->
+</div>
+<!-- ./wrapper -->
+
+<!-- 后台用户信息模态框 -->
+<div class="modal fade" id="sysUserModal" tabindex="-1" role="dialog"
+     data-backdrop="false" aria-labelledby="sysUserModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="sysUserModalLabel">用户信息</h4>
+            </div>
+            <div class="modal-body">
+                <form id="sysUserForm"
+                      action="${manageHost}/sysuser/sysUserAdd" method="post">
+                    <div class="form-group">
+                        <label for="username" class="control-label">* 用户名:</label> <input
+                            type="text" class="form-control" id="username" name="username"
+                            required>
+                    </div>
+                    <!-- <div class="form-group">
+                        <label for="email" class="control-label">邮箱:</label> <input
+                            id="email" name="email" type="text" class="form-control"
+                            placeholder="请输入邮箱"
+                            pattern="^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z0-9]+$"
+                            title="邮箱正确格式：xxx@xxx.xxx">
+                    </div> -->
+                    <div class="form-group">
+                        <label  class="control-label">* 密码:</label> <input
+                            type="password" class="form-control"
+                            name="password" placeholder="请输入密码" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">* 重复密码:</label>
+                        <input type="password" class="form-control"
+                               name="checkPassword" placeholder="请再次密码" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="locked" class="control-label">是否锁定:</label> <select
+                            class="form-control" id="locked" name="locked">
+                        <option value="false">否</option>
+                        <option value="true">是</option>
+                    </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary"
+                        onclick="sysUserFormSubmit()">提交
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="sysUserUpdateModal" tabindex="-1"
+     role="dialog" aria-labelledby="sysUserUpdateModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="sysUserUpdateModalLabel">更新用户</h4>
+            </div>
+            <div class="modal-body">
+                <form id="sysUserUpdateForm"
+                      action="${manageHost}/sysuser/sysUserUpdate" method="post">
+                    <input type="hidden" id="id" name="id" required>
+                    <div class="form-group">
+                        <label for="username2" class="control-label">用户名:</label> <input
+                            type="text" class="form-control" id="username2" name="username"
+                            required disabled>
+                    </div>
+                    <!-- <div class="form-group">
+                        <label for="email2" class="control-label">邮箱:</label> <input
+                            id="email2" name="email" type="text" class="form-control"
+                            placeholder="请输入邮箱"
+                            pattern="^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z0-9]+$"
+                            title="邮箱正确格式：xxx@xxx.xxx">
+                    </div> -->
+                    <div class="form-group">
+                        <label for="locked2" class="control-label">是否锁定:</label> <select
+                            class="form-control" id="locked2" name="locked">
+                        <option value="true">是</option>
+                        <option value="false">否</option>
+                    </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary"
+                        onclick="sysUserUpdateFormSubmit()">提交
+                </button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editUserPasswordModal" tabindex="-1"
+     role="dialog" aria-labelledby="editUserPasswordModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="editUserPasswordLabel">重置密码</h4>
+            </div>
+            <div class="modal-body">
+                <form id="editUserPasswordForm"
+                      action="${manageHost}/sysuser/change_password" method="post">
+                    <input type="hidden" id="sysUserId" name="id" required>
+                    <input type="hidden" id="username" name="username" required>
+                    <div class="form-group">
+                        <label  class="control-label">新密码:</label> <input
+                            type="password" class="form-control" name="newPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label  class="control-label">确认密码:</label> <input
+                            type="password" class="form-control" name="checkPassword" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" onclick="resetPwdSubmit()">提交</button>
+                        <button type="button" class="btn btn-default"
+                                data-dismiss="modal">关闭
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 后台用户权限模态框 -->
+<div class="modal fade" id="sysUserRoleModal" tabindex="-1"
+     role="dialog" aria-labelledby="sysUserRoleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" style="width: 600; height: 290;">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="sysUserRoleModalLabel"
+                    style="font-weight: bold;">用户信息</h4>
+            </div>
+            <div class="modal-body"
+                 style="height: 290; overflow-y: auto; padding: 0px">
+
+                <div
+                        style="margin: 0 0 15 15; padding-left: 15px; padding-top: 15px;">
+                    <span style="font-weight: bold;">用户名：</span><span
+                        id="edit-username"> </span>
+                </div>
+
+                <div id="rolelist"
+                     style="background-color: #EDE3E3; padding-top: 3px; padding-left: 15px">
+                    <span style="margin-left: 15px; font-weight: bold;">角色列表</span> <label
+                        id="checkAll" style="margin-left: 20px; font-weight: normal;">
+                    <input type="checkbox" id="checkboxCtrl"> 全选
+                </label>
+                </div>
+                <form id="sysUserRoleForm" action="#" method="post"
+                      class="form-inline" style="padding-left: 15px"></form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary"
+                        onclick="resetRoleICheck()">重置
+                </button>
+                <button type="button" class="btn btn-primary"
+                        onclick="sysUserRoleFormSubmit()">保存
+                </button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="${manageHost}/plugins/utils/md5.js"></script>
+<!-- 引用公共底部样式部分 -->
+${include("../public_footer.httl")}
+<script type="text/javascript">
+    function sysUserDel(sysUserId) {
+        if (confirm("你确定删除吗？")) {
+            window.location.href = "${manageHost}/sysuser/sysUserDelete?sysUserId=" + sysUserId;
+        }
+    }
+
+    function checkPasswords(formName) {
+        var password = $("#" + formName).find("input[name='password']").val();
+        if(password == "" || password == undefined){
+            password = $("#" + formName).find("input[name='newPassword']").val();
+        }
+        var checkPassword = $("#" + formName).find("input[name='checkPassword']").val();
+        if (password != checkPassword) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    function resetPwdSubmit() {
+        if (checkPasswords("editUserPasswordForm")) {
+            $('#editUserPasswordForm').find("input[name=newPassword]").val(hex_md5($('#editUserPasswordForm').find("input[name=newPassword]").val()));
+            $('#editUserPasswordForm').submit();
+        } else {
+            alert('密码不一致')
+        }
+    }
+
+    function sysUserFormSubmit() {
+        if (checkPasswords("sysUserForm")) {
+            $('#sysUserForm').find("input[name=password]").val(hex_md5($('#sysUserForm').find("input[name=password]").val()));
+            $('#sysUserForm').submit();
+        } else {
+            alert('密码不一致')
+        }
+    }
+
+    function sysUserUpdateFormSubmit() {
+        if (checkFormValue("sysUserUpdateForm")) {
+            $('#sysUserUpdateForm').submit();
+        }
+    }
+
+    function sysUserRoleFormSubmit() {
+        $('#sysUserRoleForm').submit();
+    }
+
+    function sysUserUpdate(sysUserId) {
+        var username = $("#" + sysUserId).find("[name='username']").text();
+        var email = $("#" + sysUserId).find("[name='email']").text();
+        var locked = $("#" + sysUserId).find("[name='locked']").text();
+        var form = $('#sysUserUpdateForm');
+        form.find("[name='id']").val(sysUserId);
+        form.find("[name='username']").val(username);
+        form.find("[name='email']").val(email);
+        form.find("[name='locked']").find("option[value=" + locked + "]").attr("selected", true);
+        $('#sysUserUpdateModal').modal({keyboard: false, backdrop: false});
+    }
+
+    function editUserPassword(sysUserId, userName) {
+
+        var form = $('#editUserPasswordForm');
+        form.find("[name='id']").val(sysUserId);
+        form.find("[name='username']").val(userName);
+        $("#editUserPasswordLabel").html("重置密码：" + userName);
+
+        $('#editUserPasswordModal').modal({keyboard: false, backdrop: false});
+    }
+
+    $(function () {
+        //弹出框高度对页面高度的控制
+        dialog_show_hide("sysUserUpdateModal,sysUserRoleModal,sysUserModal");
+    })
+
+    function sysUserUpdateFormReset() {
+        var form = $('#sysUserUpdateForm');
+        var id = form.find("[name='sysUserId']").val();
+        sysUserUpdate(id);
+    }
+
+    function checkUsername() {
+        var username = document.getElementById("username");
+        if (username.value.trim() == '') {
+            username.setCustomValidity("用户名不能为空！");
+            return false;
+        } else {
+            username.setCustomValidity("");
+            return true;
+        }
+    }
+
+    /* var checkFormValue = function(formid){
+        var form = document.getElementById(formid);;
+        for(var i=0;i< form.elements.length-1;i++){
+            var element = form.elements[i];
+            if(!checkValue(element)){
+               return false;
+            }
+        }
+        return true;
+    }
+
+    function invalidHandler(e) {
+        checkValue(e.target);
+        e.stopPropagation();
+        e.preventDefault();
+   }
+
+    var checkValue = function(element){
+        if(element.id == 'username'){
+            checkUsername();
+        }
+        if(element.id == 'checkPassword'){
+            checkPasswords();
+        }
+        if(element.checkValidity()){
+            element.parentElement.className="form-group";
+            return true;
+        }else{
+            element.parentElement.className="form-group has-error";
+            alert(element.validationMessage);
+            return false;
+        }
+    } */
+
+    function loadinvalidHandler() {
+        var myform = document.getElementById("sysUserForm");
+        for (var i = 0; i < myform.elements.length - 1; i++) {
+            //表单元素的onchange事件，优化用户体验
+            myform.elements[i].addEventListener("change", invalidHandler, false);
+        }
+        var myform2 = document.getElementById("sysUserUpdateForm");
+        for (var i = 0; i < myform.elements.length - 1; i++) {
+            //表单元素的onchange事件，优化用户体验
+            myform2.elements[i].addEventListener("change", invalidHandler, false);
+        }
+    }
+
+    //在页面初始化事件（onload）时注册的自定义事件
+    window.addEventListener("load", loadinvalidHandler, false);
+    var currRoleData;
+
+    function editUserRoleBtn(username, userType) {
+
+        $('#checkboxCtrl').iCheck('uncheck');
+        $("#edit-username").html(username);
+        $.get("${manageHost}/sysuser/getMyRole?username=" + username + "&userType=" + userType, function (data, status) {
+            if (status == "success") {
+                currRoleData = data;
+                $('#sysUserRoleForm').attr("action", "${manageHost}/sysuser/editMyRole?username=" + username + "&userType=" + userType);
+                initRoleICheck(data);
+                $('#sysUserRoleModal').modal({keyboard: false, backdrop: false});
+                window.location.href = "#role-checked0";
+                $('#rolelist').append('');
+            } else {
+                alert("该用户获取角色信息失败");
+            }
+        });
+    }
+
+    function resetRoleICheck() {
+        initRoleICheck(currRoleData);
+    }
+
+    function initRoleICheck(data) {
+        $('#sysUserRoleForm').html('');
+        $.each(data, function (key, value) {
+            var role = value.sysRoleDto.role;
+            var description = value.sysRoleDto.description;
+            var roleId = value.sysRoleDto.id;
+            var isbind = value.isbind;
+            $('#sysUserRoleForm').append('<div style="margin-top: 10px;" class="form-group col-md-12"><input type="checkbox" id="role' + key + '" name="role"  class="role-check form-control" value="' + roleId + '" checked="' + isbind + '"><label id="label' + key + '" for="role' + key + '">' + role + '：' + description + '</label></div>');
+        });
+        // $('input').iCheck({
+        // checkboxClass: 'icheckbox_minimal',
+        // radioClass: 'iradio_minimal',
+        // increaseArea: '20%' // optional
+        // });
+        var index = 0;
+        $.each(data, function (key, value) {
+            if (value.isbind) {
+                $('#role' + key).iCheck('check');
+                $('#label' + key).attr("style", "color: red;");
+                $('#label' + key).attr("id", "role-checked" + index);
+                index++;
+            }
+            else {
+                $('#role' + key).iCheck('uncheck');
+            }
+        });
+    }
+
+    window.onload = function () {
+
+        $(".iCheck-helper").click(function () {
+            if ($('#checkboxCtrl').is(':checked')) {
+                $('.role-check').iCheck('check');
+            } else {
+                $('.role-check').iCheck('uncheck');
+            }
+        });
+        $("#checkAll").click(function () {
+            if ($('#checkboxCtrl').is(':checked')) {
+                $('.role-check').iCheck('check');
+            } else {
+                $('.role-check').iCheck('uncheck');
+            }
+        });
+        window.parent.$("#waiting").hide();
+    };
+</script>
+
+
+</body>

@@ -1,0 +1,118 @@
+.tab-nav {
+	margin-bottom:30px;
+}
+
+.tab-nav li{ float:left;}
+.tab-nav li a{
+	/* border:1px solid #ccc;  */
+	padding:8px 35px;
+	background-color:#e5eaf0;
+	color:#333;
+	font-size:16px;
+	
+}
+.tab-nav .active a{
+	background-color: #fff;    
+    border-top:2px solid #397edb;      
+    padding-top:6px;  
+}
+
+.tab-ul li{
+	float:left;
+	border:1px solid #ccc; 
+	border-radius: 4px;
+	margin-right:15px;
+}
+.tab-ul  .active a{
+	background-color: #3c8dbc;
+    border-color: #367fa9;
+    color:#fff;
+}
+.bg-blue{
+	background-color: #397edb;
+}
+.blue{
+	color:#397edb;
+}
+.control-label{
+	line-height:30px;
+}
+/* #tab2 .disinpath{
+	width:15% !important;
+	margin-left:10px;
+} */
+.modal .modal-body .control-label{
+	line-height:30px;
+	width:30%;
+	text-align:right;
+}
+.modal .modal-body .form-control{
+	width:65%;
+}
+th,td{
+    vertical-align: middle !important;
+    text-align: center;
+}
+.liutr{
+	text-align: left;
+}
+.line80{
+	line-height:80px;
+	margin:0 5px;
+	font-size:30px;
+	font-weight:blod;
+}
+.round{
+	position:relative;
+	float:left;	
+	width:80px;
+	height:80px;
+	text-align: center;
+	border:1px solid #ccc;
+	border-radius:75px;
+	-moz-border-radius:75px;
+	-webkit-border-radius:75px;
+	margin-bottom:10px;
+}
+.round span{
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 30px;
+	bottom: 0;
+	margin:auto;
+    word-break: break-all;
+}
+
+#resetModal .modal-body,#logModals .modal-body{
+	min-height:50px; 
+	max-height:600px;
+	overflow-y: scroll;
+}
+#mosaicForm .outPath{
+	width:150px;
+}
+
+#modisForm .outPath{
+	width:150px;
+}
+
+#fileTypes,#fileTypes2{
+	width:130px !important;
+}
+/* .ztree li span.button.ico_docu */
+.folder_ico_close,.folder_ico_docu{
+	margin-right: 2px;
+    vertical-align: top;
+    background-position: -110px 0;
+}
+.folder_ico_open{
+    margin-right: 2px;
+    background-position: -110px -16px;
+    vertical-align: top;
+}
+.file_ico_docu{
+    margin-right: 2px !important;
+    vertical-align: top !important;
+    background-position: 110px -32px;
+}

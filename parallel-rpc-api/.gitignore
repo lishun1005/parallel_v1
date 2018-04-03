@@ -1,0 +1,43 @@
+# maven ignore
+target/
+*.jar
+*.war
+*.zip
+*.tar
+*.tar.gz
+
+# eclipse ignore
+.settings/
+.project
+.classpath
+#add by ljf
+jsonFile/*
+
+# myeclipse ignore
+.mymetadata
+MANIFEST.MF
+#add by ljf
+jsonFile/*
+
+# idea ignore
+.idea/
+*.ipr
+*.iml
+*.iws
+
+# temp ignore
+*.log
+*.cache
+*.diff
+*.patch
+*.tmp
+*.java~
+*.properties~
+*.xml~
+
+# system ignore
+.DS_Store
+Thumbs.db
+#idea
+.idea/
+rscloud-imageProcessCenter.iml

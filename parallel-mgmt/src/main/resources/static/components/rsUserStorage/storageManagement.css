@@ -1,0 +1,112 @@
+@font-face {
+	font-family:"iconfont";src:url("/fonts/iconfont.eot?t=1489107378595");src:url("/fonts/iconfont.eot?t=1489107378595#iefix") format("embedded-opentype"),url("/fonts/iconfont.woff?t=1489107378595") format("woff"),url("/fonts/iconfont.ttf?t=1489107378595") format("truetype"),url("/fonts/iconfont.svg?t=1489107378595#iconfont") format("svg")
+}
+
+.ztree li span.button.ico_docu {
+    background-position: -110px 0;
+    margin-right: 2px;
+    vertical-align: top;
+}
+.iconfont {
+	font-family: "iconfont" !important;
+	font-size: 16px;
+	font-style: normal;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale
+}
+
+.icon-file:before {
+	content: "\e600"
+}
+
+.icon-tianjiamulu:before {
+	content: "\e640"
+}
+
+.icon-question:before {
+	content: "\e6d2"
+}
+
+.content-title button {
+	margin-right: 40px
+}
+
+.content-title button span {
+	padding-right: 5px
+}
+
+.content-title .progress-show {
+	position: relative;
+	display: inline-block;
+	margin-left: 50%;
+	width: 20%
+}
+
+.content-title .progress-show .progress {
+	position: absolute;
+	margin-bottom: 0;
+	margin-top: -10px;
+	width: 100%;
+	height: 20px;
+	left: 0;
+	top: 50%
+}
+
+.content-title .progress-show .icon-question {
+	/* margin-left: 105% */
+}
+#file-edit{
+	margin-top:5px;
+}
+#file-edit a {
+	margin-right:10px;
+	font-size: 12px;
+	text-decoration: none;
+}
+#content-table thead th{
+	font-weight: normal;	
+}
+.yunfile-sort-up{	
+	
+	width: 10px;
+    height: 12px;
+	background: url(../../images/usercenter-css-img.png) -220px -228px;
+	display:none;
+}
+.progress {
+ background-color:#999 !important;	
+ width:90% !important;
+}
+
+.sizeTip {
+	position: absolute;
+	z-index:10;
+    font-family: 微软雅黑;
+    font-size: 14px;
+    color: #333333;
+    width: 299px;
+    height: 97px;
+    background: url(../../images/tips.png);
+    right: 15px;
+    top: 45px;
+}
+.kuorongNow{
+	display: block;
+    position: absolute;
+    bottom: 10px;
+    left: 40%;
+}
+.sort-down {
+    background-position: -220px -191px;
+}
+.current-path{
+	margin:10px 0;
+	font-size:16px;
+}
+.dataTables_wrapper .dataTables_paginate {
+    float: left;
+}
+.ztree li span.button.ico_docu {
+
+    background-position: -110px 0 !important;
+}

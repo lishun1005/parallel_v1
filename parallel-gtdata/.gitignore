@@ -1,0 +1,6 @@
+target/
+.classpath
+.project
+#idea
+.idea/
+parallel-gtdata.iml

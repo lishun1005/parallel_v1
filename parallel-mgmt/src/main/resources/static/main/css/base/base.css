@@ -1,0 +1,10 @@
+@charset "utf-8";
+/* CSS Document */
+.font2{font:12px/1.5 tahoma,arial,"\5b8b\4f53"; color:#6E6A6A;}
+.table-center{text-align:center;}
+.border-lightgrey{border:1px solid #e5e5e5;box-sizing: border-box;}
+.font-right{text-align:right;}
+
+.content-header>.breadcrumb>li+li:before {
+    content: '>\00a0';
+}

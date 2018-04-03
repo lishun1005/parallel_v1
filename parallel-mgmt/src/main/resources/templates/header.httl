@@ -1,0 +1,117 @@
+<a href="${manageHost}/index" class="logo">影像处理中心</a>
+
+<nav class="navbar navbar-static-top" >
+	<!-- 
+	<a href="#"  class="navbar-btn sidebar-toggle"   data-toggle="offcanvas" role="menu"> 
+		<span class="sr-only">左导航栏开关</span>
+		<span class="icon-bar"></span> 
+		<span class="icon-bar"></span> 
+		<span class="icon-bar"></span>
+	</a> 
+	-->
+
+    <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+      <span class="sr-only">Toggle navigation</span>
+    </a>
+	
+	<!-- <div class="navbar-right" > -->
+	<div class="navbar-custom-menu">
+		<ul class="nav navbar-nav">
+			<li class="dropdown user user-menu">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown"> 
+					<i class="glyphicon glyphicon-user"></i> <span> ${principal()}<i class="caret"></i></span>
+				</a>
+				<ul class="dropdown-menu">
+					<li class="user-header bg-light-blue">
+						<img src="${manageHost}/img/RS-LOGO.png" class="img-circle" alt="User Image" />
+						<p>${principal()}</p>
+					</li>
+					
+					<li class="user-footer">
+						<div class="pull-left">
+							<a href="javascript:void(0);" class="btn btn-default btn-flat" onclick="openPassWordModal()">修改密码</a>
+						</div>
+						<div class="pull-right">
+							<a href="${manageHost}/logout" class="btn btn-default btn-flat">退出</a>
+						</div>
+					</li>
+					
+				</ul>
+			</li>
+			<!-- Control Sidebar Toggle Button -->
+             <li>
+               		<a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>
+             </li>
+		</ul>
+	</div>
+</nav>
+
+<!-- 模态框 -->
+<div class="modal fade " id="passWordModal" tabindex="100" role="dialog"
+		aria-labelledby="passWordModalLabel" aria-hidden="true">
+		<div class="modal-dialog" style="width: 450px;">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="passWordModalLabel">修改密码</h4>
+				</div>
+				<div class="modal-body" style="height: 500; overflow-y: auto;">
+					<form id="passWordForm" action="${manageHost}/sysuser/change_password" method="post" class="form-horizontal bootstrap-form">
+						<div class="form-line col-md-12">
+							<div class="form-group">
+								<label class="col-sm-3 control-label">* 名称:</label>
+								<input type="password" class="form-control form-text" name="newPassword" required>
+								<input type="hidden" class="form-control" name="id" value="${getSysUser().id}">
+							</div>
+							<div class="form-group">
+								<label class="col-sm-3 control-label">确认密码:&nbsp;</label>
+								<input type="password"  class="form-control form-text" name="checkPassword">
+							</div>
+						</div>
+
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+					<button type="button" class="btn btn-primary"
+						onclick="passWordFormSubmit()">提交</button>
+				</div>
+			</div>
+		</div>
+</div>
+<script type="text/javascript" src="${manageHost}/plugins/utils/md5.js"></script>
+<script type="text/javascript">
+function openPassWordModal(){
+	$('#passWordModal').modal({ keyboard: false ,backdrop:false});
+}
+function passWordFormSubmit(){
+	/*var passwd = $('#passWordForm').find("[name='newPassword']").val();
+	if(passwd!=null && passwd!=""){
+		$('#passWordForm').submit();
+	}else{
+		alert("请输入新密码");
+	}
+*/
+    if (checkPasswords("passWordForm")) {
+        var md5Pass = hex_md5($('#passWordForm').find("input[name=newPassword]").val());
+        $('#passWordForm').find("input[name=newPassword]").val(md5Pass);
+        $('#passWordForm').submit();
+    } else {
+        alert('密码不一致')
+    }
+
+}
+function checkPasswords(formName) {
+    var password = $("#" + formName).find("input[name='newPassword']").val();
+    var checkPassword = $("#" + formName).find("input[name='checkPassword']").val();
+    if (password != checkPassword) {
+        return false;
+    } else {
+        return true;
+    }
+}
+</script>
+

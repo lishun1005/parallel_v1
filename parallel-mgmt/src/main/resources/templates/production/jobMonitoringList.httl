@@ -1,0 +1,636 @@
+<!--#set(String manageHost =  request.getScheme()+"://"+request.serverName+":"+"a".valueOf(request.serverPort)+request.getContextPath())-->
+<!--#set(PageResultBean<Map<String, Object>> pageInfo)-->
+<!--#set(long totalPage = pageInfo.totalPage)  -->
+<!--#set(int pages = pageInfo.pages)  -->
+<!--#set(int pageNum = pageInfo.pageNum)  -->
+<!--#set(PageResultBean<ProductLineDto> productlinePage)-->
+
+
+
+<!-- 引入公共头部样式部分 -->
+${include("../public_header.httl")}
+<link rel="stylesheet" type="text/css"  href="${manageHost}/plugins/ztree/ztree.css"/>
+<link rel="stylesheet" type="text/css"  href="${manageHost}/components/production/task.css">
+<style>
+label {
+	font-weight: normal;
+}
+</style>
+	<div class="wrapper row-offcanvas row-offcanvas-left">
+
+		<aside class="right-side" style="margin-left: 0px">
+		
+			<!-- 遮罩层样式  默认不显示 -->
+			<div id="waiting" class="waiting" style="display:none;">
+				<div class="grey-bg"></div>
+			    <img src="${manageHost}/img/loading.gif" alt="稍等...">
+			</div>		
+			
+			<div class="mask" style="display: none;"></div>
+			
+			<!-- Content Header (Page header) -->
+			<section class="content-header ovcl">
+				<ol class="breadcrumb">
+					<li><a><i class="fa fa-dashboard"></i> 首页</a></li>
+					<li><a href="javascript:void(0);">生产管理</a></li>
+					<li class="active">任务监控</li>
+				</ol>
+			</section>
+			
+
+			<!-- Main content -->
+			<section class="content">
+	
+				<ul class="tab-nav ">
+
+					<li  <!--#if( "cut" ==  pageType )--> class="active" <!-- #end --> attrs="cut">
+						<a href="#tab1" data-toggle="tab">切片</a>
+					</li >
+					<li <!--#if( "mosaic" == pageType )--> class="active" <!-- #end --> attrs="mosaic">
+						<a href="#tab2" data-toggle="tab">生产线</a>
+					</li>
+					<li <!--#if( "ai" == pageType  )--> class="active" <!-- #end --> attrs="ai">
+						<a href="#tab3" data-toggle="tab">人工智能</a>
+					</li>
+				</ul>
+				<div class="clearfix"></div>
+				
+				
+				<!-- 操作组 -->
+				<form class="uc_cs_form mt10" id="pageForm"
+					action="${manageHost}/production/jobMonitoring" method="get"
+					class="form-horizontal">
+					<input  type="hidden"  id="pageType" name="pageType" value="${pageType}"/>
+					
+					<input  type="hidden"  id="algorithmType"  name="algorithmType" value="pl"/>
+					
+					<input type="hidden" id="pageNo" name="pageNo" value="<!--#if("
+						" == request.getParameter("pageNo"))-->${request.getParameter("pageNo")}
+					<!--#else-->1<!--#end-->"/>
+					
+					<!--#if( "ai" !=  pageType )-->
+					<div class="oper-group mt20">
+						<div class="keywords pull-left mr20">
+					 		<span>关键字：</span>
+							<div class="input-search input-group">
+							<!--#if( "cut" ==  pageType )-->
+								<input type="text" placeholder="图层名,任务名" class="form-control input-sm" name="keyword" value="${keyword}">
+							<!-- #else -->
+								<input type="text" placeholder="任务名" class="form-control input-sm" name="keyword" value="${keyword}">
+							<!-- #end -->
+							
+							</div> 
+						</div>
+						
+						<div class="pull-left">
+							<span>状态：</span>
+							<div class="input-search input-group">
+								<select name="status" class="form-control">
+									<option value="">全部</option>
+									<option <!-- #if(status=='ACCEPTED') -->  selected="selected" <!-- #end --> value="ACCEPTED">ACCEPTED</option>
+									<option <!-- #if(status=='RUNNING') -->  selected="selected" <!-- #end -->  value="RUNNING">RUNNING</option>
+									<option <!-- #if(status=='SUCCEEDED') -->  selected="selected" <!-- #end -->  value="SUCCEEDED">SUCCEEDED</option>
+									<option <!-- #if(status=='FAILED') -->  selected="selected" <!-- #end --> value="FAILED">FAILED</option>
+								</select>
+							</div>
+							<a class="btn btn-info btn-sm btn-searchs ml20">检索</a>
+						</div>
+					</div>
+					<div class="clearfix"></div>
+					<!--#end-->
+				</form>
+				<!-- /操作组 -->
+				
+				<div class="tab-content">
+					<!--#if( "cut" ==  pageType )-->
+					<div class="tab-pane fade in active" id="tab1">		
+					
+							<div class="tab-ul mt10">
+								<ul >
+									<li class="active" attrs=""><a data-toggle="tab" class="btn">影像切片</a></li>
+									<li attrs=""><a data-toggle="tab" class="btn">PL分幅切片</a></li>
+								</ul>
+							</div>
+							<div class="clearfix"></div>
+							<!-- 列表 -->
+							<table class="table table-bordered table-hover define-name-table mt20">
+									<thead>
+										<tr>
+											
+											<th >任务名</th>
+									
+											<th >图层名</th>
+											<th width="6%">状态</th>
+											<th width="8%">进度</th>
+											<th >接收时间</th>
+											<th >开始时间</th>
+											<th >结束时间</th>
+											<!-- <th >用途</th> -->
+											<th width="18%">操作</th>
+										</tr>
+									</thead>
+									<tbody>
+										<!--#if(pageInfo.resultData)-->
+										
+										<!--#for(Map<String, Object> info : pageInfo.resultData)-->
+										<tr id="${info.id}" class="trId">
+											<td>${info.job_name}</td>
+											<td style="display:none;">${info.jobid}</td>
+											<td>${info.map_name}</td>
+											<td class="statusTd" style="display:none;">${info.status}</td>
+											<!--#if(info.status=="ACCEPTED" || info.status=="INQUEUE" || null == info.status)-->
+												<td class="">排队中</td>
+											<!-- #end -->
+											<!--#if(info.status=="RUNNING")-->
+												<td class="">生产中</td>
+											<!-- #end -->
+											<!--#if(info.status=="SUCCEEDED")-->
+												<td class="">成功</td>
+											<!-- #end -->
+											<!--#if(info.status=="FAILED")-->
+												<td class="">失败</td>
+											<!-- #end -->
+											<td>${info.progress}%</td>
+											<td>${info.accept_time}</td>
+											<td>${info.start_time}</td>
+											<td>${info.end_time} </td>
+											<!-- <td name="usage">${info.usage}</td> -->
+											<td>
+												<a  class="btn btn-xs btn-primary btn-watch">查看</a>
+												<!--  0为新增-->
+												<input type="hidden"  class="statusType" value="${info.cut_type}"/>
+												<!-- #if("INQUEUE" == info.status) -->
+												<a  class="btn btn-xs btn-primary btn-update">更新</a>
+												<!-- #end -->
+												<!-- #if("FAILED" == info.status || "SUCCEEDED" == info.status) -->
+												<a  class="btn btn-xs btn-primary btn-reset">重启</a>
+												<!-- #end -->
+												<a  class="btn btn-xs btn-primary btn-log">日志</a>
+												<a  class="btn btn-xs btn-primary btn-del">删除</a>
+											</td>
+										</tr>
+										<!-- #end -->
+										<!--#else -->
+										<tr>
+											<td colspan="6" align="center"><font color="red">无记录</font></td>
+										</tr>
+										<!--#end-->
+									</tbody>
+								</table>
+							<!-- /列表 -->
+			
+							<!-- 分页 -->
+							<div class="dataTables_paginate paging_bootstrap fl">
+								<input type="hidden" id="totalPage" value="${totalPage}"></input>
+			
+								<ul class="pagination">
+									<li class="prev">
+										<!--#if(pageNum>1)--> <a
+										href="javascript:complaintFormPage(${pageNum-1});">上一页</a> <!--#else -->
+										<!--  <a href="javascript:void(0);">上一页</a> --> <!-- #end -->
+									</li>
+			
+			
+									<!--#for(Integer userInfoPageNo : getSlider(10,pageNum,pages))-->
+									<li
+										<!--#if(userInfoPageNo == pageNum)-->class="active"<!--#end-->> <a
+										href="javascript:complaintFormPage(${userInfoPageNo});">${userInfoPageNo}</a></li>
+									<!--#end-->
+			
+			
+									<li class="next">
+										<!--#if(pageNum<pages)--> <a
+										href="javascript:complaintFormPage(${pageNum+1});">下一页</a> <!--#else -->
+										<!--  <a href="javascript:void(0);">下一页</a> --> <!-- #end -->
+									</li>
+								</ul>
+							</div>
+							
+							<div class="fl page-go">
+								当前第 ${pageNum} 页 总记录数为 ${totalPage}条 <span class="ml20">跳转到第
+									<input id="goPage" value="${pageNum}" class="integer" />页 <a
+									href="javascript:complaintFormGoPage();"
+									class="btn btn-info btn-sm ml20">GO</a>
+							</div>
+							<!-- /分页 -->
+					</div>
+					
+					<!--  #end -->
+					
+					<!--#if( "mosaic" == pageType  )-->
+					<div class="tab-pane fade in active" id="tab2">		
+							<div class="tab-ul mt10">
+								
+									<ul >
+										<!--#if(productlinePage.resultData)-->
+										<!--#for(ProductLineDto productline : productlinePage.resultData)-->
+										
+
+										<li <!--#if( algorithmType == productline.name || null == algorithmType)--> class="active"<!-- #end -->  attrs="${productline.name}">
+											<a data-toggle="tab" class="btn">${productline.displayName}</a>
+										</li>
+										<!-- #end -->
+										<!-- #end -->
+
+									</ul>
+	
+							</div>
+							<div class="clearfix"></div>
+							<!-- 列表 -->
+							<table class="table table-bordered table-hover define-name-table mt20">
+								<thead>
+									<tr>
+										<th >任务名</th>
+										<th >jobid</th>
+										<th >状态</th>
+										<th >接收时间</th>
+										<th >开始时间</th>
+										<th >结束时间</th>
+										<th >用途</th>
+										<th width="13%">操作</th>
+									</tr>
+								</thead>
+								<tbody>
+									<!--#if(pageInfo.resultData)-->
+									<!--#for(Map<String, Object> info : pageInfo.resultData)-->
+									<tr id="${info.id}" class="trId">	
+										<td>${info.job_name}</td>							
+										<td>${info.jobid}</td>
+										<td class="statusTd">${info.status}</td>
+										<td>${info.accept_time}</td>
+										<td>${info.start_time}</td>
+										<td>${info.end_time} </td>
+										<td name="usage">${info.usage}</td>
+										<td>
+											<a  class="btn btn-xs btn-primary btn-watch2">查看</a>
+											<!--  0为新增-->
+											<input type="hidden"  class="statusType" value="${info.cut_type}"/>
+											<!-- #if("PL" == info.algorithm_type) -->
+												<!-- #if("FAILED" == info.status || "SUCCEEDED" == info.status) -->
+													<a  class="btn btn-xs btn-primary btn-reset">重启</a>
+												<!-- #end -->
+											<!-- #end -->
+											<a  class="btn btn-xs btn-primary btn-log">日志</a>
+											<a  class="btn btn-xs btn-primary btn-del">删除</a>
+										</td>
+									</tr>
+									<!-- #end -->
+									<!--#else -->
+									<tr>
+										<td colspan="6" align="center"><font color="red">无记录</font></td>
+									</tr>
+									<!--#end-->
+								</tbody>
+							</table>
+							<!-- /列表 -->
+			
+							<!-- 分页 -->
+							<div class="dataTables_paginate paging_bootstrap fl">
+								<input type="hidden" id="totalPage" value="${totalPage}"></input>
+			
+								<ul class="pagination">
+									<li class="prev">
+										<!--#if(pageNum>1)--> <a
+										href="javascript:complaintFormPage(${pageNum-1});">上一页</a> <!--#else -->
+										<!--  <a href="javascript:void(0);">上一页</a> --> <!-- #end -->
+									</li>
+			
+			
+									<!--#for(Integer userInfoPageNo : getSlider(10,pageNum,pages))-->
+									<li
+										<!--#if(userInfoPageNo == pageNum)-->class="active"<!--#end-->> <a
+										href="javascript:complaintFormPage(${userInfoPageNo});">${userInfoPageNo}</a></li>
+									<!--#end-->
+			
+			
+									<li class="next">
+										<!--#if(pageNum<pages)--> <a
+										href="javascript:complaintFormPage(${pageNum+1});">下一页</a> <!--#else -->
+										<!--  <a href="javascript:void(0);">下一页</a> --> <!-- #end -->
+									</li>
+								</ul>
+							</div>
+							
+							<div class="fl page-go">
+								当前第 ${pageNum} 页 总记录数为 ${totalPage}条 <span class="ml20">跳转到第
+									<input id="goPage" value="${pageNum}" class="integer" />页 <a
+									href="javascript:complaintFormGoPage();"
+									class="btn btn-info btn-sm ml20">GO</a>
+							</div>
+							<!-- /分页 -->
+					</div>					
+					<!-- #end-->	
+					
+					<!--#if( "ai" == pageType  )-->
+					<div class="tab-pane fade in active"  id="tab3">
+						暂无任务			
+						</div>
+					<!--#end-->
+					
+				</div>
+				
+			</section>
+			<!-- /.content -->
+			
+		</aside>
+
+	</div>
+	<!-- ./wrapper -->
+	
+	<style>
+		.modal-body P{
+			font-size:16px;
+			line-height:24px;
+		}
+	</style>
+	<div class="modal fade" id="cutUpdateModals" tabindex="-1" role="dialog" aria-labelledby="msg">
+	    <div class="modal-dialog" role="document">
+	        <div class="modal-content">
+	        
+	        	<div class="modal-header bg-blue">
+			        	<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span></button>
+			        	<h4 class="modal-title" id="dataModalLabel">更新
+			        		<span class="red upadateErrorMsg" style="margin-left:40px;"></span>
+			        	</h4>
+		        </div>
+	            <div class="modal-body" style="">
+	            	<form id="cutUpdateForm" action="" method="post">
+						<div class="form-group mt10">
+				            <label for="layerName" class="control-label pull-left" >优先级：</label>
+				            <input type="text" class="form-control pull-left integer"  name="priority" >
+				            <input type="hidden" class="form-control pull-left" name="id" >
+				         </div>
+	            	</form>
+	            </div>
+	            <div class="modal-footer">
+	                <div class="modal-footer">
+		                <button type="button" class="btn bg-blue" data-dismiss="modal">关闭</button>
+		                <button type="button" onclick="cutUpdateSubmit()" class="btn bg-blue submit-btn">确认</button>
+		            </div>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+	<div class="modal fade" id="resetModal" tabindex="-1" role="dialog" aria-labelledby="qiepianModalLabel">
+	    <div class="modal-dialog" role="document">
+	        <div class="modal-content" style="width: 500px;">
+	            <div class="modal-header bg-blue">
+	                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	                <h4 class="modal-title" id="changeNameModalLabel">切片
+	                	<span class="red errorMsg" style="margin-left:40px;"></span>
+	                </h4>
+	                
+	            </div>
+	            <div class="modal-body" style="height: 400px;overflow: auto;">
+	                <form id="cuttingForm" action="${manageHost}/dataCenter/onemapCut" novalidate="novalidate">
+	                
+	                	<div class="form-group">
+					            <label for="waterMark" class="control-label  pull-left">*类型：</label>
+								<input type="hidden" class="form-control pull-left" name="cutType">
+					            <input type="text" class="form-control pull-left" name="cutTypeStr" disabled>
+				          </div>
+				          <div class="clearfix"></div>
+				          <div class="form-group mt10">
+					            <label for="layerName" class="control-label pull-left">*图层名：</label>
+					            <input type="hidden" class="form-control pull-left" name="id">
+					            <input type="text" class="form-control pull-left" id="mapName" name="mapName" placeholder="例：mi-a3-2011_jiaomendq_nansha_guangzhou_pl">
+				          </div>
+				          <div class="clearfix"></div>
+				          			          
+				          <div class="form-group mt10">
+					            <label for="layerName" class="control-label pull-left" >*输出路径：</label>
+					            <input type="text" class="form-control pull-left" id="outPath" name="outPath" placeholder="例：/outPath">
+					            <input type="hidden" class="form-control pull-left" name="inPath" >
+				          </div>
+				          <div class="clearfix"></div>
+	
+	
+				          <div class="form-group mt10">
+					            <label for="level" class="control-label  pull-left">*最大层级：</label>
+					            <input type="text" class="form-control pull-left" name="maxLayers" id="level" placeholder="例：0到20">
+				          </div>
+				          <div class="clearfix"></div>
+				          
+				          <div class="form-group mt10">
+					            <label for="level" class="control-label  pull-left">最小层级：</label>
+					            <input type="text" class="form-control pull-left" name="minLayers" id="level" placeholder="例：0到20">
+				          </div>
+				          <div class="clearfix"></div>
+				          
+				          
+				          <div class="form-group mt10">
+					            <label for="waterMark" class="control-label  pull-left">*是否覆盖：</label>
+					            <select name="isCover" id="isCover" class="form-control pull-left">
+					                <option value="true" selected>是</option>
+					                <option value="false">否</option>
+					            </select>
+				          </div>
+				          <div class="clearfix"></div>
+	
+				          <div class="form-group mt10">
+					            <label for="waterMark" class="control-label pull-left">*水印方案：</label>
+					            <select name="waterMark" id="waterMark" class="form-control pull-left">
+					                <option value="-1" selected>无</option>
+					                <option value="0">全部有水印</option>
+					                <option value="1">行列号和为奇数有水印</option>
+					                <option value="2">行列号和为偶数有水印</option>
+					            </select>
+				          </div>
+				          <div class="clearfix"></div>
+				          <div class="form-group mt10">
+					            <label for="waterMark" class="control-label pull-left">实时时间：</label>
+					            <input type="text" class="form-control pull-left date" name="realTime"  placeholder="2017/02/03">
+				          </div>
+				          <div class="clearfix"></div>
+				          <div class="form-group mt10">
+					            <label for="waterMark" class="control-label  pull-left">用途：</label>
+					            <input type="text" class="form-control pull-left" name="usage" id="level">
+				          </div>
+				          <div class="clearfix"></div>
+				          
+						<div class="modal-footer">
+			                <button type="button" class="btn bg-blue" data-dismiss="modal">关闭</button>
+			                <button type="button" onclick="cuttingSubmit()" class="btn bg-blue submit-btn">确认</button>
+			            </div>
+				    </form>
+	            </div>
+	            
+	        </div>
+	    </div>
+	</div>
+	
+	<div class="modal fade"  id="xiangqian"  tabindex="-1" role="dialog" aria-labelledby="xiangqianModalLabel">
+	    <div class="modal-dialog" role="document">
+	        <div class="modal-content" style="width: 600px;">
+	            <div class="modal-header bg-blue">
+	                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	                <h4 class="modal-title" id="changeNameModalLabel">镶嵌参数录入
+	                	<span class="red errorMsg" style="margin-left:40px;"></span>
+	                </h4>
+	                
+	            </div>
+	            <div class="modal-body" >
+	                <form id="mosaicForm2" >
+	                
+				          			          
+				          <div class="row mt10 mb10 outPathDiv">
+					            <label for="layerName" class="control-label pull-left" ><font class="blue">*</font>输出路径：</label>
+					            <div class="pull-left ml10">
+					            					            	
+					            	<!-- 1,系统用户，2，集市用户 -->
+
+									<!-- #if("1"==getSysUser().userType) -->
+									<input type="text" class="form-control  outPath" name="outPath" placeholder="例：/outPath" >
+									<!-- #else -->									
+									<input type="text" class="form-control  outPath" name="outPath" placeholder="例：/outPath" disabled>
+									<!-- #end -->	
+					            </div>
+					            <div class="pull-left ml10">				           
+									<input type="text" class="form-control " id="fileTypes" placeholder="格式:.tif或者tiff">
+					            </div>
+					            
+					            <!-- #if("2"==getSysUser().userType) -->
+					            <a class="btn bg-blue outfile pull-left ml10">选择</a>
+					            <!-- #end -->
+					            
+					            <p class="errorinpath red mt5"></p>
+				          </div>				          
+	
+	
+				          <div class="row mb10 divgroup">
+					            <label for="level" class="control-label  pull-left"><font class="blue">*</font>输出影像投影：</label>
+					            <!-- <input type="text" class="form-control pull-left project" name="project " > -->
+					            <select name="project" id="project" class="form-control pull-left">
+					                <option value="4326">WGS84</option>
+					                <option value="3857">MECATOR</option>
+					            </select>
+				          </div>
+				          <div class="clearfix"></div>
+				          
+				          <div class="row mb10 divgroup">
+					            <label for="level" class="control-label  pull-left"><font class="blue">*</font>输出影像波段数：</label>
+					            <!-- <input type="text" class="form-control pull-left" name="outBand" class="outBand"> -->
+					            <select name="outBand" id="outBand" class="form-control pull-left">
+					                <option value="3">3</option>
+					                <option value="4">4</option>
+					            </select>
+				          </div>
+				          <div class="clearfix"></div>
+
+				          <div class="row mb10 divgroup">
+					            <label for="waterMark" class="control-label pull-left"><font class="blue">*</font>输出影像字节数：</label>
+					            <!-- <input type="text" class="form-control pull-left date" name="outImage"  class="outImage"> -->
+					            <select name="outImage" id="outImage" class="form-control pull-left">
+					                <option value="8">8</option>
+					                <option value="16">16</option>
+					            </select>
+				          </div>
+				          <div class="clearfix"></div>
+				          
+						<div class="modal-footer">
+			                <button type="button" class="btn bg-blue" data-dismiss="modal">关闭</button>
+			                <button type="button" onclick="mosaicSubmit()" class="btn bg-blue submit-btn">确认</button>
+			            </div>
+				    </form>
+	            </div>
+	            
+	        </div>
+	    </div>
+	</div>
+	
+	<!-- 查看详情 -->
+	<div class="modal fade comfirmModal" id="msgModals" tabindex="-1" role="dialog" aria-labelledby="msg">
+	    <div class="modal-dialog" role="document">
+	        <div class="modal-content " >
+	        
+	        	<div class="modal-header bg-blue">
+			        	<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span></button>
+			        	<h4 class="modal-title" id="dataModalLabel">详情信息</h4>
+		        </div>
+	            <div class="modal-body" style="height: 400px;overflow: auto;">
+	            
+	            </div>
+	            <div class="modal-footer">
+	                <button type="button" class="btn bg-blue btn-default" data-dismiss="modal">关闭</button>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+	
+	<div class="modal fade " id="logModals" tabindex="-1" role="dialog" aria-labelledby="msg">
+	    <div class="modal-dialog" role="document">
+	        <div class="modal-content">
+	        
+	        	<div class="modal-header bg-blue">
+			        	<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span></button>
+			        	<h4 class="modal-title" id="dataModalLabel">日志信息</h4>
+		        </div>
+	            <div class="modal-body">
+	            		
+	            </div>
+	            <div class="modal-footer">
+	                <button type="button" class="btn bg-blue btn-default" data-dismiss="modal">关闭</button>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+	
+	<div class="modal fade " id="delModals" tabindex="-1" role="dialog" aria-labelledby="msg">
+	    <div class="modal-dialog" role="document">
+	        <div class="modal-content ">
+	        
+	        	<div class="modal-header bg-blue">
+			        	<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span></button>
+			        	<h4 class="modal-title" id="dataModalLabel">删除</h4>
+		        </div>
+	            <div class="modal-body">
+	            		您确认要删除？
+	            </div>
+	            <div class="modal-footer">
+	                <button type="button" class="btn bg-blue btn-default" data-dismiss="modal">关闭</button>
+	                <button type="button" class="btn bg-blue btn-default btn-submit">提交</button>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+	
+	<div class="modal fade comfirmModal"  id="yunpan"  tabindex="-1" role="dialog" aria-labelledby="msg">
+	    <div class="modal-dialog" role="document">
+	        <div class="modal-content">
+	        
+	        	<div class="modal-header bg-blue">
+			        	<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span></button>
+			        	<h4 class="modal-title" id="dataModalLabel">我的云盘</h4>
+			        	<p>请选择影像文件</p>	
+		        </div>
+	            <div class="modal-body">
+	            		<div class="zTree">
+							<ul id="treeDemo" class="ztree"></ul>
+						</div>
+						<input value="" type="hidden" id="pathFile"/>
+	            </div>
+	            <div class="modal-footer">
+	                <button type="button" class="btn bg-blue" data-dismiss="modal">关闭</button>
+	                <button type="button" class="btn bg-blue confirm-delete-btn">确认</button>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+
+	<!-- 引用公共底部样式部分 -->
+	${include("../public_footer.httl")}
+	<script >
+			window.onload=function(){ 
+				window.parent.$("#waiting").hide();
+			};			
+    </script>
+    <script src="${manageHost}/plugins/ztree/ztree.js" ></script>
+    <script  src="${manageHost}/components/production/jobMonitorList.js""></script>
+
+
+

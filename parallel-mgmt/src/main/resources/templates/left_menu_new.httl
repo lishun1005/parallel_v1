@@ -1,0 +1,44 @@
+<!--#set(String manageHost =  request.getScheme()+"://"+request.serverName+":"+"a".valueOf(request.serverPort)+request.getContextPath())-->
+
+<!--#set(String iframeUrl = request.getParameter("iframeUrl"))-->
+
+<!--#set(List<SysMenuDto> menuList)-->
+
+<aside id="asides" class="main-sidebar">
+	<div class="user-panel" style="height: 30px">
+			<div class="pull-left info" >
+				<p>当前用户:${principal()}</p>
+			</div>
+	</div>
+	<section class="sidebar">
+		<ul id="menu-ul" class="sidebar-menu" data-widget="tree">
+			<!-- #if(menuList) -->
+				<!-- #for(SysMenuDto menu : menuList) -->
+					<!-- #if(menu.name != 'ROOT') -->
+						<!-- #if(menu.menuType == '1') -->
+							<!-- 文件夹菜单  -->
+						       	<li id="${menu.id}" parentId="${menu.parentId}" class="treeview" style="display:none;">
+						            <a href="#">
+						                <i class="fa ${menu.icon}"></i>
+						                <span  class="head">${menu.name}</span>
+						                <i class="fa fa-angle-left pull-right"></i>
+						            </a>
+						            <ul class="treeview-menu">
+										
+						            </ul>
+						       	</li>						
+							<!-- #else(menu.menuType == '2') -->
+							
+					       	<!-- 页面菜单 -->
+					       	<li id="${menu.id}" parentId="${menu.parentId}" class="pageMenu">
+						       	<a href="${manageHost}/${menu.url}"  target="main_view" onclick="menuSelect(this)">
+						       		<i class="fa fa-angle-double-right"></i>${menu.name}
+						       	</a>
+					       	</li>						
+						<!-- #end -->
+					<!-- #end -->
+				<!-- #end -->
+			<!-- #end -->
+		</ul>
+	</section>
+</aside>

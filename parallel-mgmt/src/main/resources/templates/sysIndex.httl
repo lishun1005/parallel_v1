@@ -1,0 +1,46 @@
+ <!--#set(String manageHost =  request.getScheme()+"://"+request.serverName+":"+"a".valueOf(request.serverPort)+request.getContextPath())-->
+  
+  <link href="${manageHost}/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" /> 
+  <link href="${manageHost}/plugins/jquery-ui/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" /> 
+  <link href="${manageHost}/main/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+  <!-- Theme style -->
+  <link href="${manageHost}/main/base/css/AdminLTE.css" rel="stylesheet" type="text/css" />
+  <!-- main style -->
+  <link href="${manageHost}/main/base/css/style.css" rel="stylesheet" type="text/css" />
+
+<body class="skin-blue">
+    <title>自动化平台管理系统</title>
+        <div class="wrapper row-offcanvas row-offcanvas-left">
+            <!-- Right side column. Contains the navbar and content of the page -->
+            <aside class="right-side" style="margin-left: 0px">
+                <!-- Content Header (Page header) -->
+                <section class="content-header ovcl" >
+                        <ol class="breadcrumb"  >
+                            <li><a ><i class="fa fa-dashboard"></i> 首页</a></li>
+                        </ol>
+                        <ol class="breadcrumb" style=" margin-left: 1060px;" >
+                             <li><a> <label id="dateNow"></label></a></li>
+                        </ol>
+                </section>
+                </aside>
+                </div>
+       
+        <script src="${manageHost}/main/js/base/jquery-2.1.1.js"></script>
+        <script src="${manageHost}/plugins/jquery-ui/jquery-ui.min.js" type="text/javascript"></script>
+        <script src="${manageHost}/plugins/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+        <script src="${manageHost}/main/js/base/base.js" type="text/javascript"></script>
+         <script type="text/javascript" language="JavaScript">
+            var d = new Date();
+            switch (d.getDay()) {
+                case 0: strweek = "日"; break;
+                case 1: strweek = "一"; break;
+                case 2: strweek = "二"; break;
+                case 3: strweek = "三"; break;
+                case 4: strweek = "四"; break;
+                case 5: strweek = "五"; break;
+                case 6: strweek = "六"; break;
+            }
+            month = d.getMonth() + 1
+            $("#dateNow").text("当前时间:"+(d.getFullYear()) + "年" + month + "月" + d.getDate() + "日 星期" + strweek);
+        </script>
+</body>

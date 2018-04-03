@@ -1,0 +1,345 @@
+<!--#set(String manageHost =  request.getScheme()+"://"+request.serverName+":"+"a".valueOf(request.serverPort)+request.getContextPath())-->
+${include("../publicHttl/publicCss.httl")}
+
+<link rel="stylesheet" type="text/css"  href="${manageHost}/plugins/datepicker/css/bootstrap-datepicker.min.css">
+<link rel="stylesheet" type="text/css"  href="${manageHost}/plugins/webuploader/webuploader.css">
+<link rel="stylesheet" type="text/css"  href="${manageHost}/components/dataCenter/public.css">
+<link rel="stylesheet" type="text/css"  href="${manageHost}/components/dataCenter/searchData.css">
+<link rel="stylesheet" type="text/css"  href="${manageHost}/plugins/openlayer4/ol4.css">
+
+<div id="waiting" class="waiting" style="display:none;">
+	<div class="grey-bg"></div>
+    <img src="${manageHost}/img/loading.gif" alt="稍等...">
+</div>		
+<div class="mask" style="display: none;"></div>
+
+<div class="form-horizontal">
+                
+       <div class="col-md-11">
+           <div class="dc-sdsc-each mt10 mb10 pull-left">
+               <div class="region radio pull-left mr10">
+                   <label>
+                       <input type="radio" name="optionsRadios" value="opt1" id="select-range-regions">行政区域</label>
+               </div>
+               <div class="dc-sdsc-area pull-left">
+                   <span id="show_index_local">请选择</span> <i class="fa fa-bars"></i>
+               </div>
+           </div>
+
+           <div class="latitude pull-left mt10 ml20">
+               <div class="radio pull-left mr10">
+                   <label>
+                       <input type="radio" name="optionsRadios" value="opt2" id="select-range-ll">经纬度</label>
+               </div>
+               <div class="group pull-left">
+                   <span>左上角:</span>
+                   <input class="" id="ll_in1" type="text" placeholder="经度">
+                   <input class="" id="ll_in3" type="text" placeholder="纬度">
+               </div>
+               <div class="group pull-left">
+                   <span>右下角:</span>
+                   <input class="" id="ll_in2" type="text" placeholder="经度">
+                   <input class="" id="ll_in4" type="text" placeholder="纬度">
+               </div>
+           </div>
+
+           <div class="pull-left ml20 mt10">
+               <a class="btn btn-primary" onclick="submitSearch();">检索</a>
+           </div>
+           <div class="clearfix"></div>
+
+           <div class="cgq mt10 mb10 pull-left">
+               <div class="fbl pull-left mr10">
+                   <span>分辨率/传感器</span>
+               </div>
+               <div class="dc-cgq pull-left dropdown">
+                   <div class="dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
+                       <span id="resolution_option">请选择</span>
+                       <i class="fa fa-bars"></i>
+                   </div>
+                   <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" id="menuList">               
+                   </ul>
+               </div>
+
+               
+           </div>
+
+           <div class="dateText pull-left mt10 ml20">日期</div>
+           <div class="input-group date pull-left mt10 startDate" style="width:180px;">
+               <input type="text" class="form-control" id="startDate">
+               <span class="input-group-addon">
+                   <i class="fa fa-bars"></i>
+               </span>
+           </div>
+
+           <div class="pull-left mt10 ml10 mr10" style="line-height:34px;">-</div>
+
+           <div class="input-group date ml10 pull-left mt10 endDate" style="width:180px;">
+               <input type="text" class="form-control" id="endDate">
+               <span class="input-group-addon">
+                   <i class="fa fa-bars"></i>
+               </span>
+           </div>
+
+           <div class="clound pull-left mt10 ml20">
+               <label class="pull-left">云量</label>
+               <div class="pull-left" id="slider-range-max" style="width:65%"></div>
+               <span class="pull-left" id="amount"></span>                       
+           </div>
+           <div class="clearfix"></div>
+           <div id="government_list" class="datapro_index_arealist hide">
+               <div class="select-wrap">            
+                   <div class="select-result">
+                       <span class="current-province result-item dn" data-attr="province"></span>
+                       <span class="current-city result-item dn" data-attr="city"></span>
+                       <span class="current-town result-item dn" data-attr="town"></span>
+                       <span class="please-select">请选择</span>
+                   </div>
+                   选择省份
+                   <div class="select-province select-item">
+                       <ul class="province"></ul>
+                   </div>
+                   选择城市
+                   <div class="select-city select-item dn">
+                       <ul class="city"></ul>
+                   </div>
+                   选择乡镇/地区
+                   <div class="select-town select-item dn">
+                       <ul class="town"></ul>
+                   </div>
+                   
+
+                   <p class="cl oh pull-right mt20">
+                       <a class="close-areaselect-dataOrder">取消</a>
+                       <a class="address-confirm">确定</a>
+                   </p>
+                   <div class="clearfix"></div>
+               </div>
+           </div>
+       </div>
+       <div class="col-md-1">
+           <a href="#" class="btn-subs">任务提交</a>
+       </div>
+       <div class="clearfix"></div>   
+</div>
+   
+<div class="container mt20"> 
+             <div class="clearfix"></div>                                               
+             <div id="map"></div>  
+             <div id="rihgt-bar" class="dc2-map-tool font2 color999 abs border-grey">
+	                 <ul>
+		                     <li>
+		                         <a class="dc2-map-draw dc-cd-draw" onclick="resetTheLocalText()" id="draw_polygon" 
+		                             href="javascript:void(0)">绘制多边形</a>
+		                     </li>
+		                     <li><a class="dc2-map-shp"  data-toggle="modal" data-target="#shpModal" id="dc2-map-shp">shp文件上传</a></li>
+		                     <li class="dn">
+		                         <form id="uploadForm" enctype="multipart/form-data">
+		                              <input type="file" id="uploadfile" name="files" onchange="chooseFileAfter();">
+		                              <input type="hidden" id="selfDefinedName" name="name">
+		                         </form>
+		                     </li>
+	                 </ul>
+             </div>
+		             
+		     <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="sliceModalLabel">
+					  <div class="modal-dialog" role="document">
+							    <div class="modal-content" style="width:800px;">
+									      <div class="modal-header">
+									        	<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+												<span aria-hidden="true">&times;</span></button>
+									        	<h4 class="modal-title" id="dataModalLabel"></h4>
+									      </div>
+									      <div class="modal-body" style="border-top:none;">
+									        		<div  class="col-md-6 photos" style="word-break: break-all">
+									        			
+									        		</div>
+									        		<div  class="col-md-6" id="imageInfos" style="height:500px;overflow: hidden;overflow-y:scroll;">
+									        			
+									        		</div>
+									      </div>
+									      <div class="modal-footer" style="border-top:none;">
+									        	<!-- <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+									        	<button type="button" class="btn btn-primary btn-sub">确认</button> -->
+									      </div>
+							    </div>
+					  </div>
+		 	</div>
+                
+         	<div class="dialogModal myplfp" style="display: none">
+             	<div class="wrap">
+		                 <div class="modal-header">
+		                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		                     <div id="buttonWaiting" class="shp-waitting"></div>
+		                     <h4 class="modal-title" id="dialogTitle">上传Shp文件</h4>
+		                 </div>
+
+		                 <div class="boxAll">
+				                     <div class="mpbox1">
+				                         <p>1. 请确保您上传的Shp文件是WGS-84坐标系；</p>
+				                         <p>2. 至少包含：.dbf、.shp、.shx和 .prj四类文件，文件名均为英文。</p>
+				                         <p class="tip3 dn">3.文件大小最大支持2M，大文件请联系客服进行定制。</p>                            
+				                     </div>      
+				                     <!-- <div class="historympbox">
+				                         <b class="dn" id="duli_b">历史Shp文件（双击选择）</b>
+				                         <div class="mpbox4 dn">
+				                             <p>用户自定义的文件名</p>
+				                             <p class="notopbd">默认文件名是时间  年月日时分秒</p>
+				                         </div>
+				                     </div>
+				                     
+				                     <div class="mpbox5 dn" id="uploader">
+				                         <input id="selfrename" type="text" class="pxval" 
+				                             placeholder="已上传的文件，给这一组文件命名吧，方便以后使用~" style="width:95%;" />
+				                         <div class="boxcontent"></div>
+				                         <div style="text-align: center;">
+				                             <a class="quxiao btn btn-default " onclick="cancelCommit()">取消</a>
+				                             <a class="shshare btn btn-primary" onclick="sureCommit()">确定上传</a>
+				                         </div>
+				                     </div>
+				                     
+				                     <div class="mpbox3">                            
+				                         <div id="picker" >+选择本地文件</div>
+				                     </div> -->
+		                 </div>
+             	</div>
+         	</div>                            
+                
+	        <style>
+		         	.first_leve2 .shp a{background:none;width:138px;height:28px;line-height:28px;font-size:14px;color:#9aabb8;border-radius:4px;border:1px solid #dce4eb;font-family:"微软雅黑";text-decoration: none;cursor:pointer;text-align: center;}
+					.first_leve2 .shp a.schuan{position: relative;display: inline-block;margin:0 16px; cursor:pointer;} 
+					.first_leve2 .shp a.schuan input {position: absolute;width:128px;font-size: 28px;opacity: 0;filter:alpha(opacity=0)border:1px solid #F00;cursor:pointer;}
+					.first_leve2 .shp input{display:inline-block;width:98px;height:26px;line-height:26px;border:1px solid #dce4eb;padding-left:8px;font-size:12px;}
+					.first_leve2 .shp a.schuan:hover {color: #444;background: #eee;border-color: #bbb;}
+					.first_leve2 .shp a.dru:hover {color: #444;background: #eee;border-color: #bbb;}             	
+	        </style>
+          	<div class="modal fade first_leve2" id="shpModal" tabindex="-1" role="dialog" aria-labelledby="sliceModalLabel">
+				  <div class="modal-dialog" role="document">
+						    <div class="modal-content">
+								      <div class="modal-header">
+								        	<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+											<span aria-hidden="true">&times;</span></button>
+								        	<h4 class="modal-title" id="dataModalLabel">shp文件上传</h4>
+								      </div>
+								      <div class="modal-body shp">
+								        		<a href="javascript:;" class="schuan"  title="">
+								        		<input type="file" name="file"  id="imgFile" title="" >上传本地shp文件</input></a>
+								      </div>
+								      <div class="modal-footer">
+										        <!-- <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+										        <button type="button" class="btn btn-primary btn-sub">确认</button> -->
+								      </div>
+						    </div>
+				  </div>
+			</div>
+
+			<form id="submit_form" action=""  style="display:none" method="post">			   		
+		   		<input type="hidden" id="searchid_hidden" name="searchid">
+		   		<input type="hidden" id="areaNo_hidden" name="areaNo">
+		   		<input type="hidden" id="areaName_hidden" name="areaName" value="1">
+		   		<input type="hidden" id="type_hidden" name="type">
+		   		<input type="hidden" id="geom_hidden" name="geom">
+		   		<input type="hidden" id="shp_hidden" name="shp">
+		   		<input type="hidden" id="data_range_hidden" name="data_range">
+		   		<input type="hidden" id="image_type_hidden" name="image_type" >
+		   		<input type="hidden" id="resolution_hidden" name="resolution" >
+		   		<input type="hidden" id="resolution_id_hidden" name="resId">			   		
+		   		<input type="hidden" id="sa_sensor_hidden" name="sa_sensor" >			   		
+		   		<input type="hidden" id="cloud_hidden" name="cloud">
+		   		<input type="hidden" id="startDate_hidden" name="startDate">
+		   		<input type="hidden" id="endDate_hidden" name="endDate">			   					   		
+		   		<input type="hidden" id="image_satellite_type_hidden" name="image_satellite_type">
+		   	</form>
+          
+         	<div class=" table-con">                                                                 
+	             <div class="dc-title">
+	                 <div class="pull-left" id="dataNumSpan">搜索结果（<font class="totalNum"></font>景）</div>            
+		               <!--   <div class="pull-left dc-sd-bottom-title-btn ml10">
+		                     <span class="spanNum" style="display:none;color:#bbbbbb;">符合筛选条件（<font class="clearNums"></font>景）</span>
+		                     <a class="idChoose">ID筛选</a>                            
+		                     <a class="btn-clears" style="display:none;">清空筛选</a>
+		                 </div>   -->                            
+	             </div>                                         
+
+	             <table id="data-grid"   class="display nowrap" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th>选择</th>
+								<th>操作</th>
+								<th>ID号</th>
+								<th>卫星</th>
+								<th>传感器</th>
+								<th>采集时间</th>
+								<th>分辨率(米)</th>
+								<th>云量</th>								
+							</tr>
+						</thead>
+				</table>                                                           
+         	</div>
+	         <div class="dc-ad-drag" >
+						<span class="dc-search-result-btn" data-type="stander">搜索结果<i class="search-to-hide"></i></span>						
+			 </div>
+         	<div class="clearfix"></div>
+</div>
+
+${include("../publicHttl/publicJs.httl")}
+<script src="${manageHost}/plugins/datepicker/js/bootstrap-datepicker.min.js" ></script>
+<script src="${manageHost}/plugins/datepicker/locales/bootstrap-datepicker.zh-CN.min.js" ></script>
+<script src="${manageHost}/plugins/openlayer4/ol4.js" ></script>
+<script src="${manageHost}/plugins/webuploader/webuploader.min.js"></script>
+<script src="${manageHost}/plugins/upload/ajaxfileupload.js"></script>
+<script src="${manageHost}/plugins/upload/uploadShpFile.js"></script>
+
+<script src="${manageHost}/components/dataCenter/city.js" ></script>
+<script src="${manageHost}/components/dataCenter/map.js" ></script>
+
+
+<script type="text/javascript">
+$(function() {
+	//时间插件调用
+	$('.input-group.date').datepicker({
+	    format: "yyyy/mm/dd",        
+	    clearBtn: true,
+	    todayBtn: "linked",
+	    language: "zh-CN",
+	    orientation: "bottom left",
+	    keyboardNavigation: false,
+	    calendarWeeks: true, 
+	    autoclose: true,
+	    todayHighlight: true
+	});
+	$('.startDate').datepicker("setDate", '+7')
+	$('.endDate').datepicker("setDate", '+1m')
+    //滑动条插件调用
+	$( "#slider-range-max" ).slider({
+	        range: "min",
+	        min: 1,
+	        max: 100,
+	        value: 10,
+	        slide: function( event, ui ) {
+	          $( "#amount" ).text( ui.value );
+	        }
+	  });
+	  $( "#amount" ).text( $( "#slider-range-max" ).slider( "value" ));
+	
+	
+	  $(document).on('click', '.dc-sdsc-area', function(event) {
+	       $(".datapro_index_arealist").removeClass('hide').addClass('show');
+	       $(".modal").removeClass('webuploader-element-invisible')
+	  });
+	
+	  $(document).on('click', '.close-areaselect-dataOrder', function(event) {
+	       $(".datapro_index_arealist").removeClass('show').addClass('hide');
+	  });
+	
+	  $(document).on('click', '#menuList li', function(event) {
+			var text = $(this).text(),attr = $(this).find("a").attr("text");			
+			text = text.replace(/\s/gi,'');
+			attr = attr.replace(/\s/gi,'');
+			$("#resolution_option").text(text);
+			$("#resolution_option").attr("text",attr);		
+	  })
+
+})
+</script>
+ 

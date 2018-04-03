@@ -1,0 +1,79 @@
+<!--#set(String manageHost =  request.getScheme()+"://"+request.serverName+":"+"a".valueOf(request.serverPort)+request.getContextPath())-->
+<!DOCTYPE html>
+<html>
+<head>
+  	<meta charset="utf-8">
+  	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  	<title>影像中心处理</title>
+  	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+	<link rel="stylesheet" href="${manageHost}/plugins/bootstrap/css/bootstrap.min.css">
+
+	<link rel="stylesheet" href="${manageHost}/main/css/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="${manageHost}/main/css/base/AdminLTE.min.css">
+	<!-- 界面皮肤 -->
+	<link rel="stylesheet" href="${manageHost}/main/css/skins/_all-skins.min.css">
+	
+
+	<link href="${manageHost}/main/css/base/style.css" rel="stylesheet" type="text/css" />
+	
+	
+
+	 <!-- Google Font -->
+<!--   	<link rel="stylesheet" href="${manageHost}/main/css/base/google.font.css"> -->
+	
+	<!-- #if(msg) -->
+	<input type="hidden" id="msg" value="${msg}"></input>
+	<!-- #end -->
+	<!-- #if(webConsoleMsg) -->
+	<input type="hidden" id="webConsoleMsg" value="${webConsoleMsg}"></input>
+	<!-- #end -->
+ 
+ 
+	 <style>
+		.waiting{
+		      position: fixed;
+			  width: 0px;
+			  left: 0;
+			  top: 0;
+			  /* margin-left: -200px; */
+			  height: 100%;
+			  z-index: 2002;
+			  /* background-color: #fff; */
+			  border: 0px #8FA4F5 solid;
+			  padding: 1px;
+			  width: 100%;
+		}
+		.waiting img{  top: 50%;
+			  position: absolute;
+			  left: 50%;
+		 }
+		.grey-bg{
+			position: absolute;
+			height: 100%;
+			width: 100%;
+			background-color: #999;
+			opacity: 0.10;filter:alpha(opacity=10);
+		}
+	</style>    
+	<script type="text/javascript">	  
+		var manageHost = '${manageHost}';
+		var left_menuHeights;
+		//iframe自适应高度  
+	    function reload_view(ifm_child_height){
+	    	if(left_menuHeights>ifm_child_height){
+	    		//若左菜单栏高度大于iframe实际高度;就以做菜单栏的高度为页面的实际高度，否则以iframe的高度为实际高度
+	    		$("#main_view").height(left_menuHeights);
+	    	}
+	    	else{
+	    		$("#main_view").height(ifm_child_height);
+	    	} 	    	
+		} 	
+		var webConsoleMsg = document.getElementById("webConsoleMsg");
+		   if (webConsoleMsg != null) {
+		       console.log(webConsoleMsg.value);
+		   }
+		var webserviceIP="${manageHost}";//webservice的ip地址
+	
+	</script>	
+</head>

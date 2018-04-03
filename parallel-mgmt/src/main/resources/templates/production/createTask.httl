@@ -1,0 +1,612 @@
+<!--#set(String manageHost =  request.getScheme()+"://"+request.serverName+":"+"a".valueOf(request.serverPort)+request.getContextPath())-->
+<!--#set(PageResultBean<ProductLineDto> pageInfo)-->
+<!--#set(PageResultBean<AiModel> aiModelInfo)
+<!--#set(PageResultBean<AiVm> aiVmInfoList)
+
+<!-- 引入公共头部样式部分 -->
+${include("../public_header.httl")}
+<link rel="stylesheet" type="text/css"  href="${manageHost}/plugins/datepicker/css/bootstrap-datepicker.min.css">
+<link rel="stylesheet" type="text/css"  href="${manageHost}/plugins/ztree/ztree.css"/>
+<link rel="stylesheet" type="text/css"  href="${manageHost}/components/production/task.css">
+<style>
+	label {
+		font-weight: normal;
+	}
+	.btn-xz,.btn-xz2,.btn-modis{
+		cursor: pointer;
+	}
+
+	.form-line {
+		margin-bottom: 10px;  height: 35px;
+	}
+	.form-label{
+		width: 120px; font-weight: normal;text-align:right
+	}
+</style>
+
+
+	<div class="wrapper row-offcanvas row-offcanvas-left">
+
+		<aside class="right-side" style="margin-left: 0px">
+
+			<!-- 遮罩层样式  默认不显示 -->
+			<div id="waiting" class="waiting" style="display:none;">
+				<div class="grey-bg"></div>
+			    <img src="${manageHost}/img/loading.gif" alt="稍等...">
+			</div>
+
+			<div class="mask" style="display: none;"></div>
+
+			<section class="content-header ovcl">
+				<ol class="breadcrumb">
+					<li><a><i class="fa fa-dashboard"></i> 首页</a></li>
+					<li><a href="javascript:void(0);">生产管理</a></li>
+					<li class="active">创建任务</li>
+				</ol>
+			</section>
+
+			<!-- Main content -->
+			<section class="content">
+				<ul class="tab-nav">
+					<li class="active">
+						<a href="#tab1" data-toggle="tab">切片</a>
+					</li>
+					<li class="">
+						<a href="#tab2" data-toggle="tab">生产线</a>
+					</li>
+					<li class="">
+						<a href="#tab3" data-toggle="tab">人工智能</a>
+					</li>
+				</ul>
+
+				<div class="tab-content">
+						<div class="tab-pane fade in active" id="tab1">
+							<div class="clearfix"></div>
+							<div class="mt20">创建任务流程：填写任务名称→选择数据→选择模型→录入参数→提交任务</div>
+							<div class="form-group mt10 ">
+								<label class="pull-left control-label"><font class="blue">*</font>任务名称</label>
+								<div class="col-sm-2">
+									<input type="text" class="form-control" id="firstname" >
+								</div>
+								<!-- <div class="col-sm-2"><a class="btn bg-blue">提交任务</a></div> -->
+							</div>
+							<div class="clearfix"></div>
+
+							<div class="form-group mt10 ">
+								<label class="pull-left control-label"><font class="blue">*</font> 数据选择</label>
+								<div class="col-sm-3">
+									<!-- 1,系统用户，2，集市用户 -->
+
+									<!-- #if("1"==getSysUser().userType) -->
+									<input type="text" class="form-control disinpath" >
+									<!-- #else -->
+									<input type="text" class="form-control disinpath" value=""  disabled>
+									<!-- #end -->
+									<p class="errorinpath red"></p>
+								</div>
+								<!-- #if("2"==getSysUser().userType) -->
+								<button class="pull-left btn bg-blue ml10 chooseModal ml10" >选择影像</button>
+								<!-- #end -->
+							</div>
+							<div class="clearfix"></div>
+
+							<!-- 列表 -->
+							<div class="mt10"><label class="control-label"><font class="blue">*</font> 模型选择</label></div>
+
+							<table class="table table-bordered table-hover define-name-table mt10">
+								<thead>
+									<tr>
+										<th >序号</th>
+										<th>模型名称</th>
+										<th>模型信息</th>
+										<th>效果图示例</th>
+										<th>操作</th>
+									</tr>
+								</thead>
+								<tbody>
+										<tr>
+											<td>1</td>
+											<td>影像切片</td>
+											<td>
+												<p>介绍：影像切片是指对进行过基本处理（如镶嵌、拼接等）的影像数据进行切片处理。</p>
+												<p>主要用途：遥感集市、实时地球等平台镶嵌影像产品的浏览。</p>
+												<p>介绍：影像切片是指对进行过基本处理（如镶嵌、拼接等）的影像数据进行切片处理。</p>
+												<p>主要用途：遥感集市、实时地球等平台镶嵌影像产品的浏览。</p>
+
+											</td>
+											<td><img src="${manageHost}/img/photo.png" ></td>
+											<td><a class="btn-xz"  data-toggle="modal" data-target="#qiepianModal">选择</a></td>
+										</tr>
+										<tr>
+											<td>2</td>
+											<td>PL影像分幅</td>
+											<td>
+												<p>介绍：影像切片是指对进行过基本处理（如镶嵌、拼接等）的影像数据进行切片处理。</p>
+												<p>主要用途：遥感集市、实时地球等平台镶嵌影像产品的浏览。</p>
+												<p>介绍：影像切片是指对进行过基本处理（如镶嵌、拼接等）的影像数据进行切片处理。</p>
+												<p>主要用途：遥感集市、实时地球等平台镶嵌影像产品的浏览。</p>
+
+											</td>
+											<td><img src="${manageHost}/img/photo.png" ></td>
+											<td></td>
+										</tr>
+
+								</tbody>
+							</table>
+							<!-- /列表 -->
+
+
+						</div>
+
+						<div class="tab-pane fade" id="tab2">
+							<div class="clearfix"></div>
+							<p class="mt20">创建任务流程：填写任务名称→填写数据来源路径→选择模型→录入参数→提交任务</p>
+
+							<div class="form-group mt10">
+								<label class="pull-left control-label"><font class="blue">*</font>任务名称</label>
+								<div class="col-sm-2">
+									<input type="text" class="form-control" id="firstname" >
+								</div>
+								<!-- <div class="col-sm-2"><a class="btn bg-blue">提交任务</a></div> -->
+							</div>
+							<div class="clearfix"></div>
+							<p class="mt10">
+								<label class=" control-label pull-left"><font class="blue">*</font> 数据来源路径</label>
+								<div class="col-sm-3">
+									<!-- #if("1"==getSysUser().userType) -->
+									<input type="text" class="form-control disinpath" >
+									<!-- #else -->
+									<input type="text" class="form-control disinpath"  disabled>
+									<!-- #end -->
+                                    <p class="errorinpath red"></p>
+								</div>
+								<!-- #if("2"==getSysUser().userType) -->
+								<button class="btn pull-left bg-blue ml10 btn-inpath">选择数据</button>
+								<!-- #end -->
+							</p>
+							<div class="clearfix"></div>
+							<!-- 列表 -->
+							<p><label class=" control-label"><font class="blue">*</font> 模型选择</label></p>
+							<table class="table table-bordered table-hover define-name-table mt10">
+								<thead>
+									<tr>
+										<th >序号</th>
+										<th>模型名称</th>
+										<th>模型信息</th>
+										<th>效果图示例</th>
+										<th>操作</th>
+									</tr>
+								</thead>
+								<tbody>
+								<!--#if(pageInfo.resultData)-->
+									<!--#for(ProductLineDto info : pageInfo.resultData)-->
+									<tr>
+										<td>${for.index + 1}</td>
+										<td>${info.displayName}</td>
+										<!-- #if(info.modelId == "")-->
+										<td>
+											<p>${info.remark}</p>
+										</td>
+										<!-- #else-->
+										<td class="liutr">
+											<p>基本介绍：</p>
+											<p>技术方法</p>
+											<p>工作流程:</p>
+											<div class="liucheng" id="${info.id}" modelId="${info.modelId}">
+											</div>
+										</td>
+										<!-- #end-->
+
+										<td><img src="${manageHost}${info.effectPicPath}" ></td>
+										<td><a class="btn-xz" attr="${info.name}">选择</a></td>
+									</tr>
+									<!-- #end -->
+								<!-- #end -->
+								</tbody>
+							</table>
+						</div>
+						<div class="tab-pane fade" id="tab3">
+                            <div class="clearfix"></div>
+                            <p class="mt20">创建任务流程：填写任务名称→填写数据来源路径→选择模型→录入参数→提交任务</p>
+
+                            <div class="form-group mt10">
+                                <label class="pull-left control-label"><font class="blue">*</font>任务名称</label>
+                                <div class="col-sm-2">
+                                    <input type="text" class="form-control" id="firstname" >
+                                </div>
+                                <!-- <div class="col-sm-2"><a class="btn bg-blue">提交任务</a></div> -->
+                            </div>
+                            <div class="clearfix"></div>
+                            <p class="mt10">
+                                <label class=" control-label pull-left"><font class="blue">*</font> 数据来源路径</label>
+                                <div class="col-sm-3">
+                                    <!-- #if("1"==getSysUser().userType) -->
+                                    <input type="text" class="form-control disinpath" >
+                                    <!-- #else -->
+                                    <input type="text" class="form-control disinpath"  disabled>
+                                    <!-- #end -->
+                                    <p class="errorinpath red"></p>
+                                    </div>
+                            <!-- #if("2"==getSysUser().userType) -->
+                            <button class="btn pull-left bg-blue ml10 btn-inpath">选择数据</button>
+                            <!-- #end -->
+                            </p>
+                            <div class="clearfix"></div>
+                            <!-- 列表 -->
+                            <p><label class=" control-label"><font class="blue">*</font> 模型选择</label></p>
+                            <table class="table table-bordered table-hover define-name-table mt10">
+                                <thead>
+                                <tr>
+                                    <th >序号</th>
+                                    <th>模型名称</th>
+                                    <th>模型信息</th>
+                                    <th>效果图示例</th>
+                                    <th>操作</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <!--#if(aiModelInfo.resultData)-->
+                                <!--#for(AiModel aiModel : aiModelInfo.resultData)-->
+                                <tr>
+                                    <td>${for.index + 1}</td>
+                                    <td>${aiModel.name}</td>
+                                    <td class="liutr">
+
+                                    </td>
+
+                                    <td><img src="" ></td>
+                                    <td>
+                                        <a href="#" onclick='ai_inference_show("${aiModel.id}")'>推理</a>
+                                        <a href="#" onclick='dddddd_dd("${aiModel.id}")'>训练</a>
+                                    </td>
+                                </tr>
+                                <!-- #end -->
+                                <!-- #end -->
+                                </tbody>
+                            </table>
+						</div>
+				</div>
+
+			</section>
+			<!-- /.content -->
+		</aside>
+		<!-- /.right-side -->
+	</div>
+	<!-- ./wrapper -->
+
+	<div class="modal fade comfirmModal"  id="yunpan"  tabindex="-1" role="dialog" aria-labelledby="msg">
+	    <div class="modal-dialog" role="document">
+	        <div class="modal-content">
+
+	        	<div class="modal-header bg-blue">
+			        	<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span></button>
+			        	<h4 class="modal-title" id="dataModalLabel">我的云盘</h4>
+			        	<p>请选择影像文件</p>
+		        </div>
+	            <div class="modal-body">
+	            		<div class="zTree">
+							<ul id="treeDemo" class="ztree"></ul>
+						</div>
+						<input value="" type="hidden" id="pathFile"/>
+	            </div>
+	            <div class="modal-footer">
+	                <button type="button" class="btn bg-blue" data-dismiss="modal">关闭</button>
+	                <button type="button" class="btn bg-blue confirm-delete-btn">确认</button>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+
+
+	<div class="modal fade" id="qiepianModal" tabindex="-1" role="dialog" aria-labelledby="qiepianModalLabel">
+	    <div class="modal-dialog" role="document">
+	        <div class="modal-content" style="width: 500px;">
+	            <div class="modal-header bg-blue">
+	                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	                <h4 class="modal-title" >切片
+	                	<span class="red errorMsg" style="margin-left:40px;"></span>
+	                </h4>
+
+	            </div>
+	            <div class="modal-body" >
+	                <form id="cuttingForm" action="${manageHost}/dataCenter/onemapCut" novalidate="novalidate">
+
+	                	<div class="form-group">
+					            <label for="waterMark" class="control-label  pull-left">*类型：</label>
+					            <select name="cutType" id="cutType" class="form-control pull-left" onchange="cutTypeChange(this)">
+					                <option value="0" selected>新增</option>//如果是新增最小层不用选
+					                <option value="1">更新</option>//最小必填，输出路径不给-后台返回
+					            </select>
+				          </div>
+				          <div class="clearfix"></div>
+
+
+				          <div class="form-group mt10">
+					            <label for="layerName" class="control-label pull-left">*图层名：</label>
+					            <input type="text" class="form-control pull-left" id="mapName" name="mapName" placeholder="例：mi-a3-2011_jiaomendq_nansha_guangzhou_pl">
+				          </div>
+				          <div class="clearfix"></div>
+
+				          <div class="form-group mt10">
+					            <label for="layerName" class="control-label pull-left" >*输出路径：</label>
+					            <input type="text" class="form-control pull-left" id="outPath" name="outPath" placeholder="例：/outPath">
+					            <input type="hidden" class="form-control pull-left" name="inPath" >
+				          </div>
+				          <div class="clearfix"></div>
+
+
+				          <div class="form-group mt10">
+					            <label for="level" class="control-label  pull-left">*最大层级：</label>
+					            <input type="text" class="form-control pull-left" name="maxLayers" placeholder="例：0到20">
+				          </div>
+				          <div class="clearfix"></div>
+
+				          <div class="form-group mt10 hide">
+					            <label for="level" class="control-label  pull-left">*最小层级：</label>
+					            <input type="text" class="form-control pull-left" name="minLayers"  placeholder="例：0到20">
+				          </div>
+				          <div class="clearfix"></div>
+				           <div class="form-group mt10">
+					            <label for="level" class="control-label  pull-left">优先级：</label>
+					            <input type="text" class="form-control pull-left" name="priority" id="priority" placeholder="例：0到100">
+				          </div>
+				          <div class="clearfix"></div>
+				          <div class="form-group mt10">
+					            <label for="waterMark" class="control-label  pull-left">*是否覆盖：</label>
+					            <select name="isCover" id="isCover" class="form-control pull-left">
+					                <option value="true" selected>是</option>
+					                <option value="false">否</option>
+					            </select>
+				          </div>
+				          <div class="clearfix"></div>
+
+				          <div class="form-group mt10">
+					            <label for="waterMark" class="control-label pull-left">*水印方案：</label>
+					            <select name="waterMark" id="waterMark" class="form-control pull-left">
+					                <option value="-1" selected>无</option>
+					                <option value="0">全部有水印</option>
+					                <option value="1">行列号和为奇数有水印</option>
+					                <option value="2">行列号和为偶数有水印</option>
+					            </select>
+				          </div>
+				          <div class="clearfix"></div>
+				          <div class="form-group mt10 hide">
+					            <label for="waterMark" class="control-label pull-left">实时时间：</label>
+					            <input type="text" class="form-control pull-left date" name="realTime"  placeholder="2017/02/03">
+				          </div>
+				          <div class="clearfix"></div>
+
+				          <div class="form-group mt10">
+					            <label for="waterMark" class="control-label  pull-left">用途：</label>
+					            <input type="text" class="form-control pull-left" name="usage" >
+				          </div>
+				          <div class="clearfix"></div>
+
+						<div class="modal-footer">
+			                <button type="button" class="btn bg-blue" data-dismiss="modal">关闭</button>
+			                <button type="button" onclick="cuttingSubmit()" class="btn bg-blue ">确认</button>
+			            </div>
+				    </form>
+	            </div>
+
+	        </div>
+	    </div>
+	</div>
+
+	<div class="modal fade" id="xiangqian" tabindex="-1" role="dialog" aria-labelledby="xiangqianModalLabel">
+	    <div class="modal-dialog" role="document">
+	        <div class="modal-content" style="width: 600px;">
+	            <div class="modal-header bg-blue">
+	                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	                <h4 class="modal-title">镶嵌参数录入
+	                	<span class="red errorMsg"></span>
+	                	<span class="red errorMsg_back"></span>
+	                </h4>
+
+	            </div>
+	            <div class="modal-body" >
+	                <form id="mosaicForm" action="${manageHost}/dataCenter/onemapCut" novalidate="novalidate">
+				          <input type="hidden" class="typeMosaic" />
+				          <div class="row mt10 mb10 outPathDiv">
+					            <label for="layerName" class="control-label pull-left" ><font class="blue">*</font>输出路径：</label>
+					            <div class="pull-left">
+
+									<input type="hidden" name="modelId">
+					            	<!-- 1,系统用户，2，集市用户 -->
+									<!-- #if("1"==getSysUser().userType) -->
+									<input type="text" class="form-control outPath" name="outPath" placeholder="例：/outPath" >
+									<!-- #else -->
+									<input type="text" class="form-control outPath" name="outPath" placeholder="例：/outPath" disabled>
+									<!-- #end -->
+					            </div>
+					            <div class="pull-left ml10">
+					            	<input type="text" class="form-control " onblur="checkFilePth(this)" id="fileTypes" placeholder="格式:.tif或者tiff">
+					            	<input type="text" class="form-control hide"   onblur="checkFilePth(this)" id="fileTypes2" placeholder="格式:.txt">
+					            </div>
+					            <!-- #if("2"==getSysUser().userType) -->
+					            <a class="btn bg-blue outfile pull-left ml10">选择</a>
+					            <!-- #end -->
+
+					            <p class="errorinpath2 red mt5"></p>
+
+				          </div>
+
+
+				          <div class="row mb10 divgroup">
+					            <label for="level" class="control-label  pull-left"><font class="blue">*</font>输出影像投影：</label>
+					            <!-- <input type="text" class="form-control pull-left project" name="project " > -->
+					            <select name="project" id="project" class="form-control pull-left">
+					                <option value="4326">WGS84</option>
+					                <option value="3857">MECATOR</option>
+					            </select>
+				          </div>
+				          <div class="clearfix"></div>
+
+				          <div class="row mb10 divgroup">
+					            <label for="level" class="control-label  pull-left"><font class="blue">*</font>输出影像波段数：</label>
+					            <!-- <input type="text" class="form-control pull-left" name="outBand" class="outBand"> -->
+					            <select name="outBand" id="outBand" class="form-control pull-left">
+					                <option value="3">3</option>
+					                <option value="4">4</option>
+					            </select>
+				          </div>
+				          <div class="clearfix"></div>
+
+				          <div class="row mb10 divgroup">
+					            <label for="waterMark" class="control-label pull-left"><font class="blue">*</font>输出影像字节数：</label>
+					            <!-- <input type="text" class="form-control pull-left date" name="outImage"  class="outImage"> -->
+					            <select name="outImage" id="outImage" class="form-control pull-left">
+					                <option value="8">8</option>
+					                <option value="16">16</option>
+					            </select>
+				          </div>
+				          <div class="clearfix"></div>
+
+						<div class="modal-footer">
+			                <button type="button" class="btn bg-blue" data-dismiss="modal">关闭</button>
+			                <button type="button"  class="btn bg-blue submit-btn">确认</button>
+			                <button type="button" onclick="mosaicPlSubmit()" class="btn bg-blue submit-btn2">确认</button>
+			            </div>
+				    </form>
+	            </div>
+
+	        </div>
+	    </div>
+	</div>
+
+
+	<div class="modal fade" id="modis_modal" tabindex="-1" role="dialog" >
+		<div class="modal-dialog" role="document">
+			<div class="modal-content" style="width: 600px;">
+				<div class="modal-header bg-blue">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title">镶嵌参数录入
+						<span class="red error_message"></span>
+					</h4>
+
+				</div>
+				<div class="modal-body" >
+					<form id="modisForm" action="${manageHost}/dataCenter/onemapCut" novalidate="novalidate">
+						<div class="row mt10 mb10 outPathDiv">
+							<label class="control-label pull-left" ><font class="blue">*</font>输出路径：</label>
+							<div class="pull-left">
+								<!-- 1,系统用户，2，集市用户 -->
+								<input type="hidden" name="modelId">
+								<!-- #if("1"==getSysUser().userType) -->
+								<input type="text" class="form-control outPath" name="outPath" placeholder="例：/outPath" required="required" >
+								<!-- #else -->
+								<input type="text" class="form-control outPath" name="outPath" placeholder="例：/outPath" required="required"  disabled>
+								<!-- #end -->
+							</div>
+							<div class="pull-left ml10">
+								<input type="text" class="form-control" style="width: 130px;!important;" name="fileTypes" placeholder="格式(*.tif | *.tiff)" required="required">
+							</div>
+							<div class="pull-left ml10">
+								<!-- #if("2"==getSysUser().userType) -->
+								<a class="btn bg-blue outfile pull-left ml10">选择</a>
+								<!-- #end -->
+							</div>
+						</div>
+						<div class="row mb10 divgroup">
+							<label for="level" class="control-label  pull-left"><font class="blue">*</font>输出影像投影：</label>
+							<!-- <input type="text" class="form-control pull-left project" name="project " > -->
+							<select name="project" id="project" class="form-control pull-left">
+								<option value="4326">WGS84</option>
+								<option value="3857">MECATOR</option>
+							</select>
+						</div>
+
+
+						<div class="clearfix"></div>
+
+						<div class="modal-footer">
+							<button type="button" class="btn bg-blue" data-dismiss="modal">关闭</button>
+							<button type="button" onclick="modisSubmit()" class="btn bg-blue submit-btn2">确认</button>
+						</div>
+					</form>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+
+<div class="modal fade" id="ai_inference_modal" tabindex="-1" role="dialog"
+	 data-backdrop="false" aria-labelledby="addModal"
+	 aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">ai推理<label style="color: red" name="errorLab"></label><label style="color: red" name="errorLab"></label></h4>
+			</div>
+			<div class="modal-body">
+				<form id="ai_inference_form" class="form-inline" action="" method="post">
+
+
+
+					<div class="form-line otherParms">
+						<div class="">
+							<label class="control-label form-label" ></label>
+							<input type="text " class="form-control otherVal" name="" placeholder="" pattern="" required>
+						</div>
+					</div>
+
+					<div class="form-line firstDiv">
+						<div class=" paramDiv">
+							<label class="control-label form-label" >ps节点:</label>
+							<select name="vm" class="form-control " style="width: 150px">
+								<!--#for(AiVm aiVmInfo:aiVmInfoList.resultData)-->
+								<option value="${aiVmInfo.id}">${aiVmInfo.ipAddr}</option>
+								<!--#end-->
+							</select>
+							<input type="text" style="width: 100px;" class="form-control integer" placeholder="端口(2000~3000)" name="vm_port" required>
+							<input type="hidden" value="0" name="vm_type">
+						</div>
+					</div>
+
+					<div class="form-line firstDiv">
+						<div class=" paramDiv">
+
+							<label class="control-label form-label" >work节点:</label>
+							<select name="vm"  class="form-control " style="width: 150px">
+								<!--#for(AiVm aiVmInfo:aiVmInfoList.resultData)-->
+								<option value="${aiVmInfo.id}">${aiVmInfo.ipAddr}</option>
+								<!--#end-->
+							</select>
+							<input type="text" style="width: 100px;" class="form-control integer" placeholder="端口(2000~3000)" name="vm_port" required>
+							<input type="hidden" value="1" name="vm_type">
+							<button type="button" onclick="addIpParams(this)" class="btn btn-default btn-sm">
+								<span class="glyphicon glyphicon-plus"></span>
+							</button>
+						</div>
+					</div>
+
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+				<button type="button" class="btn btn-primary" onclick="aiInferenceAdd()">提交</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+	<!-- 引用公共底部样式部分 -->
+	${include("../public_footer.httl")}
+	<script>
+	window.onload=function(){
+		window.parent.$("#waiting").hide();
+	 };
+	</script>
+	<script src="${manageHost}/plugins/ztree/ztree.js" ></script>
+	<script src="${manageHost}/plugins/datepicker/js/bootstrap-datepicker.min.js" ></script>
+	<script src="${manageHost}/plugins/datepicker/locales/bootstrap-datepicker.zh-CN.min.js" ></script>
+	<script src="${manageHost}/components/production/task.js" ></script>
+

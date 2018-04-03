@@ -1,0 +1,132 @@
+<!--#set(String manageHost =  request.getScheme()+"://"+request.serverName+":"+"a".valueOf(request.serverPort)+request.getContextPath())-->
+<!DOCTYPE html>
+<html>
+ <head>
+  	<meta charset="utf-8">
+  	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	
+	<link rel="stylesheet" href="${manageHost}/plugins/bootstrap/css/bootstrap.min.css">
+  	<link rel="stylesheet" href="${manageHost}/main/css/font-awesome/css/font-awesome.min.css">
+  	<!-- <link rel="stylesheet" href="${manageHost}/Ionicons/css/ionicons.min.css"> -->
+  	<link rel="stylesheet" href="${manageHost}/main/css/base/AdminLTE.min.css">
+  	<link rel="stylesheet" href="${manageHost}/main/css/base/login.css">
+	<title>自动化平台管理系统</title>
+	<script type="text/javascript">
+		window.onload=function(){
+			if(this.parent!=this){
+				parent.location='${manageHost}/login.htm?iframeUrl=${iframeUrl}';
+			}
+		};
+	</script>
+ </head>
+<body class="hold-transition login-page">
+ <!-- 遮罩层样式  默认不显示 -->
+<div id="waiting" class="waiting" style="display:none;">
+<div class="grey-bg"></div>
+	<img src="${manageHost}/img/loading.gif" alt="正在登录...">
+</div>		
+
+<div class="mask" style="display: none;"></div>
+
+<div class="login-box">
+		   
+		   <div class="login-box-body">
+		   			<!-- <div class="login-logo">登 陆</div>  -->
+				   <form action="${manageHost}/login" method="post"> 
+							
+						    <p class="login-box-msg" id="errorMessage" style="color:red;">${errorMessage}</p>
+						    <div class="row mt10">
+									<!-- <p class="col-md-4">用户名：</p> -->
+									<div class="col-md-12 has-feedback">
+										  <input type="text" class="form-control username"  placeholder="用户名" /> 
+										  <span class="glyphicon glyphicon-user form-control-feedback"></span>
+									</div>
+							</div>
+							
+							<div class="row mt10">
+									<!-- <p class="col-md-4">密码：</p> -->
+									<div class="col-md-12 has-feedback">
+										  <input type="password" id="password" class="form-control" placeholder="密码" value="" />
+										  <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+									</div>
+							</div>
+							
+							<div class="row mt10">					
+									<!-- <p class="col-md-4">用户类型：</p> -->
+									<div class="col-md-12">
+									      	<select class="form-control " id="userType"> 
+									      			<!-- <option value="" selected="selected"></option>  -->
+									      			<option value="1" selected>影像处理中心</option> 
+									      			<option value="2">遥感集市</option> 
+									      	</select>
+							      	</div>
+							</div>
+							
+							<div class="row mt10">					
+									<!-- <p class="col-md-4"></p> -->
+									<div class="col-md-12">
+									      	<input type="checkbox" class="account" />记住账号
+							      	</div>
+							</div>
+							
+						    
+						    <div class="footer mt20"> 
+						     		<!-- <button type="button" onclick="userLogin()" class="btn bg-olive btn-block hover80">登陆</button>  -->
+						     		<button type="button"  onclick="userLogin()" class="btn btn-primary btn-block btn-flat">登录</button>
+						    </div> 
+						   
+				    </form> 
+			</div>
+  </div> 
+  
+  
+  <script src="${manageHost}/main/js/base/jquery.min.js"></script>
+  <script src="${manageHost}/plugins/bootstrap/js/bootstrap.min.js"></script>
+  <script src="${manageHost}/plugins/utils/md5.js" type="text/javascript"></script>
+  <script type="text/javascript">
+  
+  		$(function(){
+  			$("#password,.username").keyup(function(){
+  				$("#errorMessage").text("");
+  			})
+  			
+  			var urlName = window.location.href;
+			if(urlName.indexOf("kickout") != -1){
+				$("#errorMessage").text("该用户已经登录");
+				
+				return;
+			}
+  		})
+		function userLogin(){
+			var username=$(".username").val();
+			var password=$("#password").val();
+			var userType=$("#userType").val();
+			$("#waiting,.mask").show();
+			if(userType!=""){
+				$.ajax({
+					url:"${manageHost}/login",
+					type:"POST",
+					data:{"username":username,"password":hex_md5(password),"userType":userType},
+					success:function(res){
+						if(!!res&&res.code==2001){
+							$("#waiting,.mask").hide();
+							location='${manageHost}/index';
+						}else{
+							$("#waiting,.mask").hide();
+							$("#errorMessage").text(res.errorMessage);
+						}
+					},
+					error:function(data){
+						$("#waiting,.mask").hide();
+						alert(data.responseJSON.msg);
+					}
+				})	
+			}else{
+				$("#waiting,.mask").hide();
+				$("#errorMessage").text("请选择用户类型");
+			}
+			
+		}
+	</script> 
+ </body>
+</html>

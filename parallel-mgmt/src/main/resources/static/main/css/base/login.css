@@ -1,0 +1,27 @@
+.login-page{
+	background:url("../../../img/login_bg.png")repeat-x  center top #fff;
+	/* #d2d6de */
+}
+.login-box-body{
+	margin-top:450px;
+}
+#waiting{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-left: -45px;
+    margin-top: -150px;
+    z-index: 1000;
+}
+.row p{
+	line-height:35px;
+}
+.mt10{
+	margin-top:10px;
+}
+.mt20{
+	margin-top:20px;
+}
+.form-control-feedback{
+	right:10px !important;	
+}

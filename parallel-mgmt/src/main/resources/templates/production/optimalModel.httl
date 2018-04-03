@@ -1,0 +1,364 @@
+<!--#set(String manageHost =  request.getScheme()+"://"+request.serverName+":"+"a".valueOf(request.serverPort)+request.getContextPath())-->
+<!--#set(PageResultBean<OptimalModelDto> pageInfo)-->
+<!--#set(PageResultBean<AlgorithmDto> algorithmPageInfo)-->
+<!--#set(long totalPage = pageInfo.totalPage)  -->
+<!--#set(int pages = pageInfo.pages)  -->
+<!--#set(int pageNum = pageInfo.pageNum)  -->
+
+<!-- 引入公共头部样式部分 -->
+${include("../public_header.httl")}
+<style>
+    label {
+        font-weight: normal;
+    }
+
+    td, th {
+        text-align: center;
+        vertical-align: middle;
+    }
+    .liucheng{
+        width: 500px;
+    }
+    .round{
+        position:relative;
+        float:left;
+        width:80px;
+        height:80px;
+        text-align: center;
+        border:1px solid #ccc;
+        border-radius:75px;
+        -moz-border-radius:75px;
+        -webkit-border-radius:75px;
+        margin-bottom:10px;
+        cursor: pointer;
+    }
+    .round p{
+        float: right;
+        cursor: pointer;
+        display: none;
+    }
+    .round span{
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 30px;
+        bottom: 0;
+        margin:auto;
+        word-break: break-all;
+    }
+    .line80{
+        line-height:80px;
+        margin:0 5px;
+        font-size:30px;
+        font-weight:blod;
+    }
+    .error_msg{
+        color: red;
+    }
+</style>
+
+
+<div class="wrapper row-offcanvas row-offcanvas-left">
+
+    <aside class="right-side" style="margin-left: 0px">
+
+        <section class="content-header ovcl">
+            <ol class="breadcrumb">
+                <li><a><i class="fa fa-dashboard"></i> 首页</a></li>
+                <li><a href="javascript:void(0);">生产管理</a></li>
+                <li class="active">算法管理</li>
+            </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+            <!-- 操作组 -->
+            <form class="uc_cs_form" id="pageForm"
+                  action="${manageHost}/algorithm/list" method="get"
+                  class="form-horizontal">
+                <input type="hidden" id="pageNo" name="pageNo" value="<!--#if("
+                " == request.getParameter("pageNo"))-->${request.getParameter("pageNo")}
+                <!--#else-->
+                1
+                <!--#end-->
+                "/>
+                <div class="oper-group">
+                    <span>关键字：</span>
+                    <div class="input-search input-group">
+                        <input type="text" placeholder="图层名,用户名" style=""
+                               class="form-control input-sm" name="keyword" value="${keyword}">
+                    </div>
+                    <button class="btn btn-info btn-sm ml20">检索</button>
+                </div>
+            </form>
+            <!-- /操作组 -->
+            <!-- /操作组 -->
+            <div class="content-table-title">
+                <i class="fa fa-pencil"></i>
+                <button class="btn btn-info btn-sm ml20" onclick="add()">新增
+                </button>
+            </div>
+            <!-- 列表 -->
+            <table class="table table-bordered table-hover define-name-table">
+                <thead>
+                <tr>
+                    <th width="10%">名称</th>
+                    <th width="5%">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!--#if(pageInfo.resultData)-->
+                <!--#for(OptimalModelDto info : pageInfo.resultData)-->
+                <tr id="${info.id}">
+                    <td name="name">${info.name}</td>
+                    <td>
+                        <a href="javascript:void(0);" onclick="optimalModel('${info.id}')">[算法编排]</a>
+                        <a href="${manageHost}/optimalModel/delete?id=${info.id}" onClick="return confirm('确定删除?');" >[删除]</a>
+                    </td>
+                </tr>
+                <!-- #end -->
+                <!--#else -->
+                <tr>
+                    <td colspan="3" align="center"><font color="red">无记录</font></td>
+                </tr>
+                <!--#end-->
+                </tbody>
+            </table>
+            <!-- /列表 -->
+
+            <!-- 分页 -->
+            <div class="dataTables_paginate paging_bootstrap fl">
+                <input type="hidden" id="totalPage" value="${totalPage}"></input>
+
+                <ul class="pagination">
+                    <li class="prev">
+                        <!--#if(pageNum>1)--> <a
+                            href="javascript:complaintFormPage(${pageNum-1});">上一页</a> <!--#else -->
+                        <!--  <a href="javascript:void(0);">上一页</a> --> <!-- #end -->
+                    </li>
+
+
+                    <!--#for(Integer userInfoPageNo : getSlider(10,pageNum,pages))-->
+                    <li
+                    <!--#if(userInfoPageNo == pageNum)-->class="active"<!--#end-->> <a
+                        href="javascript:complaintFormPage(${userInfoPageNo});">${userInfoPageNo}</a></li>
+                    <!--#end-->
+
+
+                    <li class="next">
+                        <!--#if(pageNum<pages)--> <a
+                            href="javascript:complaintFormPage(${pageNum+1});">下一页</a> <!--#else -->
+                        <!--  <a href="javascript:void(0);">下一页</a> --> <!-- #end -->
+                    </li>
+                </ul>
+            </div>
+            <div class="fl page-go">
+                当前第 ${pageNum} 页 总记录数为 ${totalPage}条 <span class="ml20">跳转到第
+						<input id="goPage" value="${pageNum}" class="integer"/>页 <a
+                        href="javascript:complaintFormGoPage();"
+                        class="btn btn-info btn-sm ml20">GO</a>
+            </div>
+            <!-- /分页 -->
+        </section>
+        <!-- /.content -->
+    </aside>
+    <!-- /.right-side -->
+</div>
+<!-- ./wrapper -->
+
+<div class="modal fade" id="saveModal" tabindex="-1" role="dialog"
+     data-backdrop="false" aria-labelledby="addModal"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">编辑</h4>
+            </div>
+            <div class="modal-body">
+                <form id="saveForm"  class="form-horizontal bootstrap-form" action="${manageHost}/optimalModel/save" method="post">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">* 名称:</label>
+                        <input type="text" class="form-control form-text" name="name" required>
+                        <input type="hidden" class="form-control" name="id">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" onclick="saveSubmit()">提交</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="optimalModelModal"  data-backdrop="false"
+     data-dialog-name="dialog-imagePrice" role="dialog"
+     aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog" >
+        <div class="modal-content" >
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">
+                    <label>算法编排</label>
+                    <label class="error_msg"></label>
+                </h4>
+
+            </div>
+            <div class="modal-body" style="height: 490px; overflow-y: auto; " >
+                <form id="optimalModelForm" class="form-horizontal bootstrap-form" role="form" action="${manageHost}/optimalModel/save" method="post">
+                    <div class="form-group">
+                        <input type="hidden" name="id">
+                        <div class="liucheng">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <table class="table table-bordered table-hover define-name-table">
+                            <thead>
+                            <tr>
+                                <th width="10%">名称</th>
+                                <th width="10%">显示名称</th>
+                                <th width="5%">操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <!--#if(algorithmPageInfo.resultData)-->
+                            <!--#for(AlgorithmDto algorithmDto : algorithmPageInfo.resultData)-->
+                            <tr id="${algorithmDto.id}">
+                                <td name="name">${algorithmDto.name}</td>
+                                <td name="displayName">${algorithmDto.displayName}</td>
+                                <td>
+                                    <a href="javascript:void(0);" onclick="addAlgorithm('${algorithmDto.id}')">[添加]</a>
+                                </td>
+                            </tr>
+                            <!-- #end -->
+                            <!--#else -->
+                            <tr>
+                                <td colspan="3" align="center"><font color="red">无记录</font></td>
+                            </tr>
+                            <!--#end-->
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" onclick="saveModel()">提交</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+<!-- 引用公共底部样式部分 -->
+${include("../public_footer.httl")}
+
+<script type="text/javascript">
+    function saveModel() {
+        var id = $("#optimalModelForm").find("input[name='id']").val();
+        var ids = "";
+        $(".round").find("label").each(function () {
+            ids = ids + $(this).text() + ",";
+        });
+        $.ajax({
+            type : 'POST',
+            url:'${manageHost}/optimalModel/saveModel',
+            data : {"algorithmIds":ids.substr(0, ids.length -1),id:id },
+            success : function(data) {
+                if(data.code == 2001){
+                    window.parent.showMsg("添加成功");
+                    location.reload();
+                    $('#optimalModelModal').hide();
+                }else {
+                    window.parent.showMsg(data.message);
+                }
+            }
+        });
+    }
+    function loadCloseBtn() {
+        var i = 0 ;
+        $(".round").each(function () {
+            $(this).mouseover(function () {
+                $(this).find("p").css("display","block");
+            });
+            $(this).mouseout(function () {
+                $(this).find("p").css("display","none");
+            });
+        })
+        $(".glyphicon-remove").click(function () {
+            $(this).parent().prev().remove();
+            $(this).parent().remove();
+        })
+    }
+    function addAlgorithm(id){
+        var displayName = $("#" + id).find("td[name='displayName']").text();
+
+        $(".liucheng").append("<div class='pull-left line80'>→</div>")
+            .append("<div class='round'><label style='display: none' >"+id+"</label><p class='glyphicon glyphicon-remove'></p><span>" + displayName +"</span></div>");
+        loadCloseBtn();
+    }
+    function saveSubmit(){
+        if (checkFormValue("saveForm")) {
+            $('#saveForm').submit();
+        }
+    }
+
+    function add() {
+        var form = $('#saveForm');
+        form.find("input").val("");
+        $('#saveModal').modal({keyboard: false, backdrop: false});
+    }
+    function optimalModel(id) {
+        $("#optimalModelForm").find("input[name='id']").val(id);
+        $(".liucheng").find("div").remove();
+        $.ajax({
+            type : 'get',
+            url:'${manageHost}/optimalModel/queryOptimalModelByModelId?modelId='+ id,
+            success : function(data) {
+                if(data.code == 2001){
+                   if (data.resultDataList != null){
+                       for(i =0 ; i<data.resultDataList.length; i++){
+                           addAlgorithm(data.resultDataList[i].algorithmid);
+                       }
+                   }
+                }else {
+                    window.parent.showMsg(data.message);
+                }
+            }
+        });
+
+        $('#optimalModelModal').modal({keyboard: false, backdrop: false});
+    }
+
+    $(function () {
+        dialog_show_hide("saveModal");
+        dialog_show_hide("optimalModelModal");
+    })
+
+    function checkUsername() {
+        var username = document.getElementById("username");
+        if (username.value.trim() == '') {
+            username.setCustomValidity("用户名不能为空！");
+            return false;
+        } else {
+            username.setCustomValidity("");
+            return true;
+        }
+    }
+    window.onload = function () {
+        window.parent.$("#waiting").hide();
+        loadCloseBtn();
+    };
+
+</script>

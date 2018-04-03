@@ -1,0 +1,427 @@
+<!--#set(String manageHost =  request.getScheme()+"://"+request.serverName+":"+"a".valueOf(request.serverPort)+request.getContextPath())-->
+<!--#set(com.chinarsgeo.rscloudmart.core.repository.page.Page<SysLog> resultPage)-->
+<!--#set(List<Integer> orderPageNos = resultPage.getSlider(10))-->
+<!-- #set(Map<Integer,String> payTypeMap) -->
+<!--set(int totalPage = resultPage.getTotalPages())  -->
+<!--#set(String allFieldMeaning)  -->
+<!-- 引入公共头部样式部分 -->
+${include("../public_header.httl")}
+
+<body class="skin-blue">
+	
+	<div class="wrapper row-offcanvas row-offcanvas-left">
+		<!-- Right side column. Contains the navbar and content of the page -->
+		<aside class="right-side" style="margin-left: 0px">
+			<!-- Content Header (Page header) -->
+			<section class="content-header ovcl">
+				<ol class="breadcrumb">
+					<li><a href="${manageHost}/index.htm"><i
+							class="fa fa-dashboard"></i> 首页</a></li>
+					<li><a href="#">系统管理</a></li>
+					<li class="active"><a
+						href="${manageHost}/sysLog/list.htm">后台日志列表</a></li>
+				</ol>
+			</section>
+
+			<!-- Main content -->
+			<section class="content">
+				<!-- 操作组 -->
+				<form class="uc_cs_form" id="pageForm"
+					action="${manageHost}/sysLog/list.htm" method="get"
+					class="form-horizontal">
+					<input type="hidden" id="pageNo" name="pageNo" value="<!--#if("" == request.getParameter("pageNo"))-->${request.getParameter("pageNo")}
+					<!--#else-->
+					1
+					<!--#end-->
+					"/>
+					<div class="oper-group">
+						<div>
+							<span>关键字：</span>
+							<div class="input-search input-group">
+								<input type="text" placeholder="操作内容，用户名/表名/ID" style=""
+									class="form-control input-sm" name="keyword" value="${keyword}">
+							</div>
+							<span> 时间：</span>
+						<div class="input-group date inline-t input-date">
+							<input class="form-control nofont_select" size="16"
+								onfocus="$.openCalendar(this)" type="text" name="beginTime"
+								id="beginTime" value="${beginTime}"> <label
+								class="input-group-addon cursor-p" for="beginTime"><span
+								class="fa fa-clock-o"></span></label>
+						</div>
+						至
+						<div class="input-group date inline-t input-date">
+							<input class="form-control nofont_select" size="16"
+								onfocus="$.openCalendar(this)" onfocus="$.openCalendar(this)"
+								type="text" name="endTime" id="endTime" value="${endTime}">
+							<label class="input-group-addon cursor-p" for="endTime"><span
+								class="fa fa-clock-o"></span></label>
+						</div>
+							<button class="btn btn-info btn-sm ml20">检索</button>
+						</div>
+					</div>
+				</form>
+				<!-- /操作组 -->
+				<div class="content-table-title">
+					<i class="fa fa-pencil"></i> 日志一览
+					<input type="hidden" class="" name="allFieldMeaning" id="allFieldMeaning" value ="${allFieldMeaning}" >
+				</div>
+				
+				<!-- 列表 -->
+				<table class="table table-bordered table-hover define-name-table"  style="text-align: left;">
+					<thead>
+						<tr>
+							<th width="3%">序号</th>
+							<th width="7%">操作内容</th>
+							<th width="5%">用户名</th>
+							<th width="10%">操作时间</th>
+							<th width="7%">操作表名</th>
+							<th width="15%">操作ID</th>
+							<th width="5%">操作详情</th>
+							 
+								   
+						</tr>
+					</thead>
+					<tbody>
+						<!--#if(resultPage.result)-->
+						<!--#for(Map<String, Object> sysLog : resultPage.result)-->
+						<tr>
+							<td>${(resultPage.pageNo-1)*resultPage.pageSize+for.index+1}</td>
+							<td>${sysLog.action}</td>
+							<td>${sysLog.get('sys_username')}</td>
+							<td>${sysLog.created_dt}</td>
+							<td>${sysLog.target_table}</td>
+							<td>${sysLog.target_id}</td>
+							<td><a href="javascript:void(0);"
+								   onclick="infoDetail('${sysLog.id}')">点击查看</a>
+								   <input type="hidden" class="" name="content" id="${sysLog.id}" value ="${sysLog.update_value}" >
+								   </td>
+						</tr>
+						<!-- #end -->
+						<!--#else -->
+						<tr>
+							<td colspan="7" align="center"><font color="red">找不到搜索订单记录</font></td>
+						</tr>
+						<!--#end-->
+					</tbody>
+				</table>
+				<!-- /列表 -->
+
+				<!-- 分页 -->
+				<!--#if(orderPageNos)-->
+				<div class="dataTables_paginate paging_bootstrap fl">
+					<input type="hidden" id="totalPage" value="${totalPage}"></input>
+					<ul class="pagination">
+						<li class="prev">
+							<!--#if(resultPage.hasPrePage)--> <a
+							href="javascript:complaintFormPage(${resultPage.prePage});">上一页</a> <!--#else -->
+							<!-- <a href="javascript:void(0);">上一页</a> --> <!-- #end -->
+						</li>
+						<!--#for(Integer orderPageNo : orderPageNos)-->
+						<li
+							<!--#if(orderPageNo == resultPage.pageNo)-->class="active"<!--#end-->>
+							<a href="javascript:complaintFormPage(${orderPageNo});">${orderPageNo}</a>
+						</li>
+						<!--#end-->
+
+						<li class="next">
+							<!--#if(resultPage.hasNextPage)--> <a
+							href="javascript:complaintFormPage(${resultPage.nextPage});">下一页</a>
+							<!--#else --> <!--  <a href="javascript:void(0);">下一页</a> --> <!-- #end -->
+						</li>
+					</ul>
+				</div>
+				<div class="fl page-go">
+					当前第 ${resultPage.pageNo} 页 总记录数为 ${resultPage.totalItems}条 <span
+						class="ml20"> 跳转到第 <input id="goPage"
+						value="${resultPage.pageNo}" class="integer" /> 页<a
+						href="javascript:complaintFormGoPage();"
+						class="btn btn-info btn-sm ml20">GO</a>
+				</div>
+				<!--#end-->
+				<!-- /分页 -->
+			</section>
+			<!-- /.content -->
+		</aside>
+		<!-- /.right-side -->
+	</div>
+	<!-- ./wrapper -->
+	
+	
+	<!-- 模态框 -->
+	<!-- 新增 -->
+	<div class="modal fade " id="infoModal" tabindex="-1" role="dialog"
+		style="z-index: 10" aria-labelledby="infoModalLabel"
+		aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content" style="width: 520; overflow-y: auto;">
+				<div class="modal-header" style="text-align: center">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="infoModalLabel"
+						style="font-weight: bold;">新增纯支付订单</h4>
+				</div>
+				<div class="modal-body" style="height: 480; overflow-y: auto;">
+					<form id="infoForm" action="add" method="post" class="form-inline"
+						enctype="multipart/form-data">
+
+						<div class="form-line " style="margin-bottom: 10px;margin-left: 30px;">
+							<div class="form-group">
+								<label class="control-label" style="width: 100;font-weight: normal;">联系人:</label> 
+								<input type="text" class="form-control" style="width: 230;" name="userName" placeholder="集市用户名" required>
+								<input type="hidden" class="form-control" name="userId" id="userId">
+								<input type="hidden" class="form-control" 	name="couponNo" id="couponNo">
+							</div>
+						</div>
+						<div class="form-line " style="margin-bottom: 10px;margin-left: 30px;">
+							<div class="form-group">
+								<label class="control-label" style="width: 100;font-weight: normal;">联系方式:</label> <input
+									type="text" class="form-control" style="width: 230;" name="phoneNo" placeholder="手机号码">
+							</div>
+						</div>
+
+						<div class="form-line " style="margin-bottom: 10px;margin-left: 30px;">
+							<div class="form-group date inline-t ">
+								<label class="control-label" style="width: 100;font-weight: normal;">对应合同编号:</label>
+								<input class="form-control" style="width: 230;"
+									style="cursor: pointer; background-color: white;" type="text"
+									id="contractNo" name="contractNo" >
+							</div>
+						</div>
+						<div class="form-line " style="margin-bottom: 10px;margin-left: 30px;">
+							<div class="form-group date inline-t ">
+								<label class="control-label" style="width: 100;font-weight: normal;">订单金额:</label> <input
+									class="form-control" onblur="checkAmount()"
+									style=" background-color: white;width: 230;" type="text"
+									id="orderAmount" name="orderAmount" required>(单位：元)
+							</div>
+						</div>
+						<div class="form-line "
+							style="margin-bottom: 10px; margin-left: 30px;">
+							<div class="form-group date inline-t ">
+								<label class="control-label"
+									style="width: 100; font-weight: normal;">支付类型:</label>
+									<select class="form-control" name="payType" id="payTypeSel" onchange="checkAmount()" required>
+									<!--#for(entry : payTypeMap)-->
+										<option value="${entry.key}">${entry.value}</option>
+									<!--#end -->
+								</select>
+							</div>
+						</div>
+						<div class="form-line " style="margin-bottom: 10px;margin-left: 30px;">
+							<div class="form-group date inline-t ">
+								<label class="control-label" style="width: 100;vertical-align: top;font-weight: normal;">订单内容:</label>
+								<textarea  class="" name="orderContent"
+									style="height: 200; width: 250;"></textarea>
+							</div>
+						</div>
+						<div class="form-line " style="display: none;">
+							<div class="form-group">
+								<label class="control-label" style="width: 100;">id:</label> <input
+									type="text" class="form-control" name="blank_input">
+							</div>
+						</div>
+					</form>
+				</div>
+
+				<div class="modal-footer" style="text-align: center;">
+					<button type="button" class="btn btn-primary"
+						onclick="infoFormSubmit()">确定</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+
+				</div>
+			</div>
+		</div>
+	</div>
+     
+      <!-- 订单内容 -->
+	<div class="modal fade " id="detailModal" tabindex="-1" role="dialog"
+		style="z-index: 10" aria-labelledby="infoModalLabel"
+		aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content" style="width: 500; overflow-y: auto;">
+				<div class="modal-header" style="text-align: center">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="infoModalLabel">操作详情</h4>
+				</div>
+				<div class="modal-body" style="height: 450; overflow-y: auto;">
+					<form id="detailForm" action="" method="post" class="form-inline"
+						enctype="multipart/form-data">
+						<label class="" name =lbl_content id="lb_content" style="font-size: 17; font-weight: 500;"></label>
+					
+					</form>
+				</div>
+
+				<div class="modal-footer" style="text-align: center;">
+					
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 引用公共底部样式部分 -->
+	${include("../public_footer.httl")}
+<script type="text/javascript">
+
+
+
+	function infoAdd() {
+		var form = $('#infoForm');
+		
+		$('#infoModal').modal({
+			keyboard : false,
+			backdrop : false
+		});
+		
+		
+		 form.find("input[name='userName']").blur(function(){
+        	//setTimeout(function(){
+        		 if($(this).val().length<1){
+        			 form.find("input[name='userId']").val("");
+                    // $("#infoForm input[name='realName']").val("");
+        		 }
+        		
+        		 var userName = $(this).val();
+        		 if(!userName){return;}
+        		 var params = {username:userName};
+        		 var url = "${manageHost}/cloudSchool/getRealNameByUserName";
+        			$.getJSON(url,params,function(data) {
+        				var count = data.count;
+        				var namedate = data.realnameDate;
+        				if("1" == count){
+        					/* if(namedate[0].realname){
+        						//$("#infoForm input[name='realName']").attr("placeholder",namedate[0].realname); 
+        						form.find("input[name='realName']").val(namedate[0].realname);
+        					}else{
+        						form.find("input[name='realName']").attr("placeholder","用户名为空");
+        					} */
+        					form.find("input[name='userId']").val(namedate[0].id);
+        				}else if("0" == data.count){
+        					form.find("input[name='realName']").attr("placeholder","无匹配用户");
+        					alert("没有该用户，请重新输入！");
+        					$(this).val("");
+        					form.find("input[name='userId']").val("");
+        					form.find("input[name='realName']").val("");
+        				}else{
+        					alert("请求出错");
+        				}
+        			});
+        	//},2000);
+        });
+		
+	}
+	
+
+	
+	
+
+	
+	
+	//提交新增表单 
+	function infoFormSubmit() {
+
+		var form = $('#infoForm');
+
+		if (checkFormValue()) {
+			form.submit();
+		}
+
+	}
+
+	/**
+	 *显示订单内容
+	 */
+	function infoDetail(id) {
+
+		var form = $("#detailForm");
+
+		var content = $("#" + id).val();
+		
+		var obj=$("#" + id);
+		
+		
+		
+		var test=showContent(content);
+		
+		
+		
+		var lb=form.find("[name='lbl_content']")
+		lb.text("");
+		lb.append(test);
+		
+		$('#detailModal').modal({
+			keyboard : false,
+			backdrop : false
+		});
+
+	}
+	
+	
+	function showContent(dataStr) {
+		if(dataStr==""||dataStr==null||undefined==dataStr){
+			return "";
+		}
+		
+		var allFieldMeaning=$("#allFieldMeaning").val();
+		var result="";
+		
+		var fieldMap=$.parseJSON(allFieldMeaning);
+		var data=$.parseJSON(dataStr);
+		var fieldMeaning;
+		for ( var o in data) {
+			
+			 var ttest=data[o];
+			if(null==data[o]||data[o]==""){
+				continue;
+			} 
+			fieldMeaning=fieldMap[o];
+			
+			if(fieldMeaning!=null||fieldMeaning!=""){
+				if(undefined==fieldMeaning){
+					result+=o+":"+data[o]+"<br>";
+				}else{
+					result+=fieldMeaning+":"+data[o]+"<br>";
+					
+				}
+			}else{
+				result+=o+":"+data[o]+"<br>";
+			}
+		}
+
+		return result;
+	}
+
+	/* var checkFormValue = function(form) {
+		if (form == null) {
+			form = document.getElementById("infoForm");
+		}
+		for (var i = 0; i < form.elements.length - 1; i++) {
+			var element = form.elements[i];
+			if (!checkValue(element)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	var checkValue = function(element) {
+		if (element.checkValidity()) {
+			//element.parentElement.className = "form-group";
+			return true;
+		} else {
+			element.parentElement.className = "form-group has-error";
+			//alert(element.validationMessage);
+			return false;
+		}
+	} */
+	window.onload = function() {
+		window.parent.$("#waiting").hide();
+	}
+</script>
+</body>

@@ -1,0 +1,14 @@
+<script src="${manageHost}/main/js/base/jquery.min.js"></script>
+<script src="${manageHost}/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="${manageHost}/plugins/jquery-ui/jquery-ui.min.js"></script>
+<script src="${manageHost}/main/js/base/adminlte.js"></script>
+
+<script src="${manageHost}/plugins/dataTables/jquery.dataTables.js" ></script>
+<script src="${manageHost}/plugins/dataTables/dataTables.scroller.js" ></script>
+<script src="${manageHost}/plugins/datepicker/js/bootstrap-datepicker.min.js" ></script>
+<script src="${manageHost}/plugins/datepicker/locales/bootstrap-datepicker.zh-CN.min.js" ></script>
+<script>
+window.onload = function() {
+	window.parent.$("#waiting").hide();
+}
+</script>

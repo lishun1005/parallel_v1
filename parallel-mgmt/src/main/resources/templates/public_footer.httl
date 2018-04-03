@@ -1,0 +1,56 @@
+<!--#set(String manageHost =  request.getScheme()+"://"+request.serverName+":"+"a".valueOf(request.serverPort)+request.getContextPath())-->
+
+<script src="${manageHost}/main/js/base/jquery.min.js"></script>
+<script src="${manageHost}/plugins/jquery-ui/jquery-ui.min.js"></script>
+<script>
+  $.widget.bridge('uibutton', $.ui.button);
+</script>
+<script src="${manageHost}/plugins/bootstrap/js/bootstrap.min.js"></script>
+<!-- Slimscroll -->
+<script src="${manageHost}/plugins/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+<!-- AdminLTE App -->
+<script src="${manageHost}/main/js/base/adminlte.js"></script>
+<!-- AdminLTE for demo purposes 右侧栏目工具 -->
+<script src="${manageHost}/main/js/base/demo.js"></script>
+<script src="${manageHost}/main/js/base/base.js"></script>
+<script src="${manageHost}/plugins/jqueryValidate/formValidata.js"></script>
+<script src="${manageHost}/main/js/base/app.js"></script>
+
+
+<script type="text/javascript">
+
+	$(document).ready(function() {
+		
+		var msg = document.getElementById("msg");
+		if (msg != null) {
+			window.parent.showMsg(msg.value);
+		}
+		
+		$("#main_view").load(function(){
+			$("#main_view").height($(".main-sidebar").height() - 6 );
+		}); 
+		/**
+		 * 组建菜单树（原理：页面原先的菜单是乱的，根据parentId构建菜单树）
+		 */
+		$("#menu-ul").find("li").each(function() { //遍历出所有的菜单项li
+			var parentId = $(this).attr("parentId"); //获取当前菜单的父级id
+			if ($("#" + parentId).length > 0) { //父菜单不存在则不做处理				
+				$(this).appendTo("#" + parentId + " ul:first"); //将该菜单移动到其父菜单的ul下面
+			}
+		});
+		
+		/*
+		 * 遍历左侧树 有子节点则显示，没有则不显示
+		 * 验证用户权限
+		 */
+		var num = $(".treeview-menu:has(li)").length;
+		for (var i = 0; i < num; i++) {
+			var $this = $(".treeview-menu:has(li)").eq(i);
+			$this.parent().show();
+		}
+		
+		$(".pageMenu").click(function() {
+			$("#waiting").show();
+		}); 
+	});
+</script>

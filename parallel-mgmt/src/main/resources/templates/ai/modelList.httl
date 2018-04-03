@@ -1,0 +1,477 @@
+<!--#set(String manageHost =  request.getScheme()+"://"+request.serverName+":"+"a".valueOf(request.serverPort)+request.getContextPath())-->
+<!--#set(PageResultBean<AiModel> pageInfo)-->
+<!--#set(long totalPage = pageInfo.totalPage)  -->
+<!--#set(int pages = pageInfo.pages)  -->
+<!--#set(int pageNum = pageInfo.pageNum)  -->
+
+<!-- 引入公共头部样式部分 -->
+${include("../public_header.httl")}
+
+<style>
+    label {
+        font-weight: normal;
+    }
+
+    td, th {
+        text-align: center;
+        vertical-align: middle;
+    }
+    .form-line {
+        margin-bottom: 10px;  height: 35px;
+    }
+    .form-label{
+        width: 120px; font-weight: normal;text-align:right
+    }
+</style>
+
+
+<div class="wrapper row-offcanvas row-offcanvas-left">
+
+    <aside class="right-side" style="margin-left: 0px">
+
+        <section class="content-header ovcl">
+            <ol class="breadcrumb">
+                <li><a><i class="fa fa-dashboard"></i> 首页</a></li>
+                <li><a href="javascript:void(0);">人工智能管理</a></li>
+                <li class="active">集群虚拟机管理</li>
+            </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+            <!-- 操作组 -->
+            <form class="uc_cs_form" id="pageForm"
+                  action="${manageHost}/ai/vmList" method="get"
+                  class="form-horizontal">
+                <input type="hidden" id="pageNo" name="pageNo" value="<!--#if("
+                " == request.getParameter("pageNo"))-->${request.getParameter("pageNo")}
+                <!--#else-->
+                1
+                <!--#end-->
+                "/>
+                <div class="oper-group">
+                    <span>关键字：</span>
+                    <div class="input-search input-group">
+                        <input type="text" placeholder="ip地址" style=""
+                               class="form-control input-sm" name="keyword" value="${keyword}">
+                    </div>
+                    <button class="btn btn-info btn-sm ml20">检索</button>
+                </div>
+            </form>
+            <!-- /操作组 -->
+            <!-- /操作组 -->
+            <div class="content-table-title">
+                <i class="fa fa-pencil"></i>
+                <button class="btn btn-info btn-sm ml20" onclick="add()">新增
+                </button>
+            </div>
+            <!-- 列表 -->
+            <table class="table table-bordered table-hover define-name-table">
+                <thead>
+                <tr>
+                    <th width="10%">模型名称</th>
+                    <th width="5%">训练模型路径</th>
+                    <th width="5%">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!--#if(pageInfo.resultData)-->
+                <!--#for(AiModel info : pageInfo.resultData)-->
+                <tr id="${info.id}">
+                    <td name="name">${info.name}</td>
+                    <td>${info.logdir}</td>
+                    <td>
+                        <a href="javascript:void(0);" onclick="update('${info.id}')">更新</a>
+                        <a href="javascript:void(0);" onclick="addFile('${info.id}')">上传算法</a>
+                        <a href="${manageHost}/ai/model/delete?id=${info.id}" onClick="return confirm('确定删除?');" >删除</a>
+                    </td>
+                </tr>
+                <!-- #end -->
+                <!--#else -->
+                <tr>
+                    <td colspan="3" align="center"><font color="red">无记录</font></td>
+                </tr>
+                <!--#end-->
+                </tbody>
+            </table>
+            <!-- /列表 -->
+
+            <!-- 分页 -->
+            <div class="dataTables_paginate paging_bootstrap fl">
+                <input type="hidden" id="totalPage" value="${totalPage}"></input>
+
+                <ul class="pagination">
+                    <li class="prev">
+                        <!--#if(pageNum>1)--> <a
+                            href="javascript:complaintFormPage(${pageNum-1});">上一页</a> <!--#else -->
+                        <!--  <a href="javascript:void(0);">上一页</a> --> <!-- #end -->
+                    </li>
+
+
+                    <!--#for(Integer userInfoPageNo : getSlider(10,pageNum,pages))-->
+                    <li
+                    <!--#if(userInfoPageNo == pageNum)-->class="active"<!--#end-->> <a
+                        href="javascript:complaintFormPage(${userInfoPageNo});">${userInfoPageNo}</a></li>
+                    <!--#end-->
+
+
+                    <li class="next">
+                        <!--#if(pageNum<pages)--> <a
+                            href="javascript:complaintFormPage(${pageNum+1});">下一页</a> <!--#else -->
+                        <!--  <a href="javascript:void(0);">下一页</a> --> <!-- #end -->
+                    </li>
+                </ul>
+            </div>
+            <div class="fl page-go">
+                当前第 ${pageNum} 页 总记录数为 ${totalPage}条 <span class="ml20">跳转到第
+						<input id="goPage" value="${pageNum}" class="integer"/>页 <a
+                        href="javascript:complaintFormGoPage();"
+                        class="btn btn-info btn-sm ml20">GO</a>
+            </div>
+            <!-- /分页 -->
+        </section>
+        <!-- /.content -->
+    </aside>
+    <!-- /.right-side -->
+</div>
+<!-- ./wrapper -->
+
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog"
+     data-backdrop="false" aria-labelledby="addModal"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">编辑 <label style="color: red" name="errorLab"></label></h4>
+            </div>
+            <div class="modal-body">
+                <form id="addForm" class="form-inline" action="" method="post">
+                    <div class="form-line firstDiv">
+                        <div class="form-group">
+                            <label class="control-label form-label">* 模型名称:</label>
+                            <input type="text" class="form-control" name="name" required>
+                        </div>
+                    </div>
+                    <div class="form-line paramDiv">
+                        <div class="form-group">
+                            <label class="control-label form-label"></label>
+                            <input type="text" style="width: 100px;" class="form-control" placeholder="参数名称" name="name" required>
+                            <input type="text" class="form-control" placeholder="参数说明" name="remark">
+                            <select  class="form-control" name="type" placeholder="选择参数类型">
+                                <option value="0">小数</option>
+                                <option value="1">整数</option>
+                                <option selected value="2">字符串</option>
+                            </select>
+                            <button type="button" onclick="addParams(this)" class="btn btn-default btn-sm">
+                                <span class="glyphicon glyphicon-plus"></span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" onclick="addSubmit()">提交</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="updateModal" tabindex="-1" role="dialog"
+     data-backdrop="false" aria-labelledby="addModal"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">更新 <label style="color: red" name="errorLab"></label></h4>
+            </div>
+            <div class="modal-body">
+                <form id="updateForm" class="form-inline" action="" method="post">
+                    <div class="form-line firstDiv">
+                        <div class="form-group">
+                            <label class="control-label form-label">* 模型名称:</label>
+                            <input type="text" class="form-control" name="name" required>
+                            <input type="hidden" class="form-control" name="id" required>
+                        </div>
+                    </div>
+                    <div class="form-line paramDiv">
+                        <div class="form-group">
+                            <label class="control-label form-label"></label>
+                            <input type="text" style="width: 100px;" class="form-control" placeholder="参数名称" name="name" required>
+                            <input type="text" class="form-control" placeholder="参数说明" name="remark">
+                            <select  class="form-control" name="type" placeholder="选择参数类型">
+                                <option value="0">小数</option>
+                                <option value="1">整数</option>
+                                <option selected value="2">字符串</option>
+                            </select>
+                            <button type="button" onclick="addParams(this)" class="btn btn-default btn-sm">
+                                <span class="glyphicon glyphicon-plus"></span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" onclick="updateSubmit()">提交</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="fileModal" tabindex="-1" role="dialog"
+     data-backdrop="false" aria-labelledby="addModal"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">上传算法文件 <label style="color: red" name="errorLab"></label></h4>
+            </div>
+            <div class="modal-body">
+                <form id="fileForm" class="form-inline"  method="post">
+                    <div class="form-line firstDiv">
+                        <div class="form-group">
+                            <label class="control-label form-label">文件:</label>
+                            <input type="file" style="width: 250px" class="form-control" name="modelFile" required>
+                            <input type="hidden" name="aiModelId">
+                            <select  class="form-control" name="type">
+                                <option selected value="0">主文件</option>
+                                <option value="1">子文件</option>
+                            </select>
+                            <button type="button" class="btn btn-primary" onclick="fileSubmit()">上传</button>
+                        </div>
+                    </div>
+                    <div class="form-group" style="width: 100%">
+                        <table class="table table-bordered table-hover define-name-table">
+                            <thead>
+                                <tr>
+                                    <th>名称</th>
+                                    <th>类型</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody class="fileModelBody">
+
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 引用公共底部样式部分 -->
+${include("../public_footer.httl")}
+
+<script type="text/javascript">
+    function deleteFile(id,modelId) {
+        if(confirm('确定删除')){
+            $.post(
+                "${manageHost}/ai/model/delfile",
+                {"id" : id},
+                function (res) {
+                    if(res.code == 2001){
+                        loadFile(modelId);
+                        window.parent.showMsg("删除成功");
+                    }else{
+                        $('#fileModal').find("label[name='errorLab']").text(res.message);
+                    }
+                }
+            )
+        }
+    }
+    function loadFile(modelId) {
+        $(".fileModelBody").empty();
+        $.ajax({
+            url: "${manageHost}/ai/model/files",
+            type: "post",
+            data: {"aiModelId" : modelId},
+            success:function (res) {
+                if(res.code == 2001){
+                    if(res.resultDataList.length > 0){
+                        for (var i =0; i < res.resultDataList.length; i++){
+                            var type = "";
+                            if(res.resultDataList[i].type == 0){
+                                type = "主文件";
+                            }else {
+                                type = '子文件';
+                            }
+                            var html = "<tr><td>"+res.resultDataList[i].fileName+"</td>";
+                            html += "<td>" + type + "</td>";
+                            html += '<td><a href="#" onclick="deleteFile(\''+res.resultDataList[i].id+'\',\''+modelId+'\')" >删除</a></td></tr>';
+                            $(".fileModelBody").append(html);
+                        }
+                    }
+                }else{
+                    $('#fileModal').find("label[name='errorLab']").text(res.message);
+                }
+            }
+        });
+    }
+    function addFile(modelId) {
+        $("#fileForm").find("input[name=aiModelId]").val(modelId);
+        loadFile(modelId)
+        $('#fileModal').modal({keyboard: false, backdrop: false});
+    }
+    function fileSubmit() {
+        if (checkFormValue("fileForm")) {
+            var modelId = $("#fileForm").find("input[name=aiModelId]").val();
+            var formData = new FormData($("#fileForm")[0]);
+            var type = $("#fileForm").find("select[name=type]").val();
+            $.ajax({
+                url: "${manageHost}/ai/model/addfile",
+                type: "post",
+                data: formData,
+                encType: 'multipart/form-data', //表明上传类型为文件
+                processData: false, //这里设置成false，表明上传数据不需转换成字符串
+                contentType: false,
+                success:function (res) {
+                    if(res.code == 2001){
+                        loadFile(modelId);
+                        $("#fileForm").find("input[name='modelFile']").val("");
+                        window.parent.showMsg("上传成功");
+                    }else{
+                        $('#fileModal').find("label[name='errorLab']").text(res.message);
+                    }
+                }
+            }).fail(function(res) {
+                $('#fileModal').find("label[name='errorLab']").text(res.responseJSON.message);
+            });
+        }
+    }
+
+    function delParams(e) {
+        $(e).parent().parent().remove();
+    }
+    function addParams(e) {
+        var clone = $(e).parent().parent().clone();
+        clone.find("input[type=text]").val("");
+        var btn = clone.find('.btn-default');
+        btn.find(".glyphicon-plus").removeClass("glyphicon-plus").addClass("glyphicon-minus");
+        btn.attr("onclick","delParams(this)")
+        $(e).parent().parent().after(clone);
+        return clone;
+
+    }
+    function addSubmit(){
+        var form = $('#addForm');
+        var aiModel = new Object();
+        aiModel.name = form.find(".firstDiv").find("input[name='name']").val();
+        var conditons = [];
+        form.find(".paramDiv").each(function () {
+            var aiModelParams = new Object();
+            aiModelParams.name = $(this).find("input[name='name']").val();
+            aiModelParams.type = $(this).find("select[name='type']").val();
+            aiModelParams.remark = $(this).find("input[name='remark']").val();
+            conditons.push(aiModelParams)
+        });
+        var name = form.find("input[name='name']").val();
+        if (checkFormValue("addForm")) {
+            $.ajax({
+                url: "${manageHost}/ai/model/add",
+                type: "post",
+                data:{"aiModelJson": JSON.stringify(aiModel), "aiModelParamsJson":JSON.stringify(conditons)},
+                success:function (res) {
+                    if(res.code == 2001){
+                        window.location = "${manageHost}/ai/model/list?msg=添加成功"
+                    }else{
+                        $('#addModal').find("label[name='errorLab']").text(res.message);
+                    }
+                }
+            });
+        }
+    }
+
+    function updateSubmit(){
+        var form = $('#updateForm');
+        var aiModel = new Object();
+        aiModel.name = form.find(".firstDiv").find("input[name='name']").val();
+        aiModel.id = form.find(".firstDiv").find("input[name='id']").val();
+        var conditons = [];
+        form.find(".paramDiv").each(function () {
+            var aiModelParams = new Object();
+            aiModelParams.name = $(this).find("input[name='name']").val();
+            aiModelParams.type = $(this).find("select[name='type']").val();
+            aiModelParams.remark = $(this).find("input[name='remark']").val();
+            conditons.push(aiModelParams)
+        });
+        var name = form.find("input[name='name']").val();
+        if (checkFormValue("updateForm")) {
+            $.ajax({
+                url: "${manageHost}/ai/model/update",
+                type: "post",
+                data:{"aiModelJson": JSON.stringify(aiModel), "aiModelParamsJson":JSON.stringify(conditons)},
+                success:function (res) {
+                    if(res.code == 2001){
+                        window.location = "${manageHost}/ai/model/list?msg=更新成功"
+                    }else{
+                        $('#updateModal').find("label[name='errorLab']").text(res.message);
+                    }
+                }
+            });
+        }
+    }
+    function add() {
+        var form = $('#addForm');
+        form.find("input").val("");
+        $('#addModal').modal({keyboard: false, backdrop: false});
+    }
+    function update(id) {
+        var form = $('#updateForm');
+        var name = $("#" + id).find("td[name='name']").text();
+        form.find("input").val("");
+        form.find(".firstDiv").find("input[name='id']").val(id);
+        form.find(".firstDiv").find("input[name='name']").val(name);
+
+        var i = 0;
+        form.find(".paramDiv").each(function () {//保留第一个
+            if(i > 0){
+                $(this).remove();
+            }
+            i = i + 1;
+        });
+        $.get("${manageHost}/ai/model/queryParmasByAiModelId", {"aiModelId":id}, function (res) {
+            if(res.code == 2001){
+                if(res.resultDataList.length > 0){
+                    for (var i =0; i < res.resultDataList.length; i++){
+                        if(i == 0){
+                            form.find(".paramDiv").find("input[name='name']").val(res.resultDataList[i].name);
+                            form.find(".paramDiv").find("select[name='type']").val(res.resultDataList[i].type)
+                            form.find(".paramDiv").find("input[name='remark']").val(res.resultDataList[i].remark);
+                        }else{
+                            var clone = addParams($(form.find(".paramDiv")[0]).find(".btn-default"));
+                            $(clone).find("input[name='name']").val(res.resultDataList[i].name);
+                            $(clone).find("select[name='type']").val(res.resultDataList[i].type);
+                            $(clone).find("input[name='remark']").val(res.resultDataList[i].remark);
+                        }
+                    }
+                }
+            }else{
+                $('#updateModal').find("label[name='errorLab']").text("加载模型参数失败:" + res.message);
+            }
+        })
+        $('#updateModal').modal({keyboard: false, backdrop: false});
+    }
+
+    $(function () {
+        dialog_show_hide("saveModal");
+    })
+
+    window.onload = function () {
+        window.parent.$("#waiting").hide();
+    };
+</script>
