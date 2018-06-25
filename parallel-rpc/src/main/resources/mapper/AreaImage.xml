@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rsclouds.gtparallel.dao.AreaImageDao">
+  <resultMap id="BaseResultMap" type="com.rsclouds.gtparallel.entity.AreaImage">
+    <id column="id" jdbcType="CHAR" property="id" />
+    <result column="area_no" jdbcType="CHAR" property="areaNo" />
+    <result column="image_row_col" jdbcType="VARCHAR" property="imageRowCol" />
+    <result column="image_satellite_type" jdbcType="VARCHAR" property="imageSatelliteType" />
+    <result column="image_start_resolution" jdbcType="NUMERIC" property="imageStartResolution" />
+    <result column="image_spectrum_type" jdbcType="VARCHAR" property="imageSpectrumType" />
+    <result column="begin_time" jdbcType="VARCHAR" property="beginTime" />
+    <result column="update_time" jdbcType="VARCHAR" property="updateTime" />
+    <result column="gemo" jdbcType="OTHER" property="gemo" />
+    <result column="range" jdbcType="OTHER" property="range" />
+    <result column="num" jdbcType="INTEGER" property="num" />
+    <result column="is_cover" jdbcType="INTEGER" property="isCover" />
+    <result column="data_id" jdbcType="CHAR" property="dataId" />
+    <result column="image_product_type" jdbcType="VARCHAR" property="imageProductType" />
+    <result column="relation_no" jdbcType="CHAR" property="relationNo" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="image_cloudage" jdbcType="NUMERIC" property="imageCloudage" />
+    <result column="sensor_id" jdbcType="CHAR" property="sensorId" />
+    <result column="product_level" jdbcType="CHAR" property="productLevel" />
+    <result column="collect_start_time" jdbcType="VARCHAR" property="collectStartTime" />
+    <result column="file_path" jdbcType="VARCHAR" property="filePath" />
+    <result column="product_id" jdbcType="VARCHAR" property="productId" />
+    <result column="iscorrect" jdbcType="BIT" property="iscorrect" />
+    <result column="jobid" jdbcType="VARCHAR" property="jobid" />
+    <result column="area_no_array" jdbcType="ARRAY" property="areaNoArray" />
+    <result column="img_url" jdbcType="VARCHAR" property="imgUrl" />
+    <result column="image_area" jdbcType="DOUBLE" property="imageArea" />
+    <result column="record_id" jdbcType="VARCHAR" property="recordId" />
+    <result column="collect_end_time" jdbcType="VARCHAR" property="collectEndTime" />
+    <result column="image_end_resolution" jdbcType="NUMERIC" property="imageEndResolution" />
+    <result column="tip" jdbcType="VARCHAR" property="tip" />
+    <result column="srid" jdbcType="VARCHAR" property="srid" />
+    <result column="area_description" jdbcType="VARCHAR" property="areaDescription" />
+    <result column="image_size" jdbcType="BIGINT" property="imageSize" />
+    <result column="auto_tag" jdbcType="SMALLINT" property="autoTag" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, area_no, image_row_col, image_satellite_type, image_start_resolution, image_spectrum_type, 
+    begin_time, update_time, gemo, "range", num, is_cover, data_id, image_product_type, 
+    relation_no, "name", image_cloudage, sensor_id, product_level, collect_start_time, 
+    file_path, product_id, iscorrect, jobid, area_no_array, img_url, image_area, record_id, 
+    collect_end_time, image_end_resolution, tip, srid, area_description, image_size, 
+    auto_tag
+  </sql>
+  <select id="query"  parameterType="com.rscloud.ipc.rpc.api.dto.AreaImageSeachDto" resultType="AreaImage">
+		select id, area_no, image_row_col as imageRowCol, image_satellite_type as imageSatelliteType, image_start_resolution as imageStartResolution,
+			   image_end_resolution as imageEndResolution,image_spectrum_type as imageSpectrumType, begin_time as beginTime, update_time as updateTime, 
+			   st_asgeojson(gemo,16,0) as gemo,range, num,is_cover as isCover, image_area as imageArea, data_id as dataId, 
+			   image_product_type as imageProductType, relation_no as relationNo, name,image_cloudage as imageCloudage,sensor_id as sensorId,product_level as productLevel,
+			   to_date(collect_start_time,'yyyy/mm/dd') as collectStartTime,
+			   to_date(collect_end_time,'yyyy/mm/dd') as collectEndTime,product_id as productId,
+			   file_path as filePath,area_no_array as areaNoArray ,img_url as imgUrl,area_description as areaDescription
+			   from rscipc_area_image
+		<where>
+			<if test = "areaCode != null &amp;&amp; areaCode != '' "><!-- 区域id -->
+				and #{areaCode} = ANY(area_no_array)
+			</if>
+			<if test="imageSatelliteType != null &amp;&amp; imageSatelliteType != ''">
+				and image_satellite_type =#{imageSatelliteType}
+			</if>
+			<if test="sensorId != null &amp;&amp; sensorId != ''">
+				and sensor_id =#{sensorId}
+			</if>
+			<if test="imageStartResolution != null &amp;&amp; imageStartResolution != ''">
+				and image_start_resolution =#{imageStartResolution}
+			</if>
+			<if test="startTime != null"><!-- 影像开始采集时间 -->
+				and collect_start_time &gt;= #{startTime}
+			</if>
+			<if test="endTime != null">
+				and collect_start_time &lt;= #{endTime}
+			</if>
+			<if test="startcloudsRange != null"><!-- 云量 -->
+				and image_cloudage &gt;= #{startcloudsRange}
+			</if>
+			<if test="endcloudsRange != null ">
+				and image_cloudage &lt;= #{endcloudsRange}
+			</if>
+			<if test="gemo != null &amp;&amp; gemo != ''" >
+				and ST_Intersects(gemo, ST_GeomFromText(#{gemo},4326))
+			</if>
+		</where>
+	</select>
+	<select id="queryById" resultType="AreaImage">
+		SELECT id, area_no as areaNo, image_row_col as imageRowCol, image_satellite_type as imageSatelliteType, 
+			image_start_resolution as imageStartResolution, image_spectrum_type as imageSpectrumType, 
+			begin_time as beginTime, update_time as updateTime, gemo, range, num, is_cover as isCover, 
+			data_id as dataId, image_product_type as imageProductType, relation_no as relationNo,
+			name, image_cloudage as imageCloudage, sensor_id as sensorId, product_level as productLevel,
+			collect_start_time as collectStartTime, file_path as filePath, product_id as productId, 
+			iscorrect, jobid, area_no_array as areaNoArray, img_url as imgUrl, image_area as imageArea, 
+			record_id as recordId, collect_end_time as collectEndTime, image_end_resolution as imageEndResolution, 
+			tip, srid, area_description as areaDescription, image_size as imageSize, auto_tag as autoTag
+		FROM rscm_area_image
+		WHERE id = #{id}
+	</select>
+</mapper>

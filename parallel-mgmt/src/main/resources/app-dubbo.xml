@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+	<dubbo:application name="ipc-rpc-client" logger="slf4j"  />
+ 
+	<dubbo:registry protocol="zookeeper" address="127.0.0.1:2181" />
+
+
+	<dubbo:consumer init="false" retries="0"/>
+
+	<dubbo:reference id="aiModelService" interface="com.rscloud.ipc.rpc.api.service.AiModelService" timeout="100000" />
+
+	<dubbo:reference id="aiVmService" interface="com.rscloud.ipc.rpc.api.service.AiVmService" timeout="100000" />
+
+	<dubbo:reference id="hbaseTableService" interface="com.rscloud.ipc.rpc.api.service.HbaseTableService" timeout="100000" />
+
+	<dubbo:reference id="algorithmService" interface="com.rscloud.ipc.rpc.api.service.AlgorithmService" timeout="100000" />
+
+	<dubbo:reference id="productlineService" interface="com.rscloud.ipc.rpc.api.service.ProductlineService" timeout="100000" />
+
+	<dubbo:reference id="optimalModelService" interface="com.rscloud.ipc.rpc.api.service.OptimalModelService" timeout="100000" />
+
+	<dubbo:reference id="changeDetetionService" interface="com.rscloud.ipc.rpc.api.service.ChangeDetetionService" timeout="100000" />
+
+	<dubbo:reference id="areaInfoService" interface="com.rscloud.ipc.rpc.api.service.AreaInfoService" timeout="100000" />
+
+	<dubbo:reference id="sysUserService" interface="com.rscloud.ipc.rpc.api.service.SysUserService" timeout="100000" />
+
+	<dubbo:reference id="sysRoleService" interface="com.rscloud.ipc.rpc.api.service.SysRoleService" timeout="100000" />
+
+	<dubbo:reference id="sysMenuService" interface="com.rscloud.ipc.rpc.api.service.SysMenuService" timeout="100000" />
+
+	<dubbo:reference id="satelliteService" interface="com.rscloud.ipc.rpc.api.service.SatelliteService" timeout="100000" />
+
+	<dubbo:reference id="cutService" interface="com.rscloud.ipc.rpc.api.service.CutService"  />
+
+	<dubbo:reference id="mosaicService" interface="com.rscloud.ipc.rpc.api.service.MosaicService" />
+</beans>

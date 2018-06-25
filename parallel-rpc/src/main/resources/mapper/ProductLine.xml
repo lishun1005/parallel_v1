@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rsclouds.gtparallel.dao.ProductLineDao" >
+  <resultMap id="beanMap" type="com.rsclouds.gtparallel.entity.ProductLine" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="display_name" property="displayName" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="effect_pic_path" property="effectPicPath" jdbcType="VARCHAR" />
+    <result column="model_id" property="modelId" jdbcType="VARCHAR" />
+    <result column="is_del" property="isDel" jdbcType="SMALLINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <association property="optimalModel" javaType="OptimalModel"
+                 select="com.rsclouds.gtparallel.dao.OptimalModelDao.queryById" column="model_id">
+    </association>
+  </resultMap>
+  <sql id="column_name" >
+    id, "name", display_name, remark, effect_pic_path, model_id, is_del, create_time
+  </sql>
+
+  <select id="queryAll" resultMap="beanMap">
+    select
+    <include refid="column_name" />
+    from rsipc_product_line a
+    <where>
+      <if test="keyword!=null and keyword!=''">
+        <bind name="keyword" value="'%' + keyword + '%'" />
+        and (a.name like #{keyword} or a.displayName like #{keyword} )
+      </if>
+      and a.is_del=0
+    </where>
+  </select>
+
+  <insert id="insert" parameterType="com.rsclouds.gtparallel.entity.ProductLine" >
+    insert into rsipc_product_line
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        "name",
+      </if>
+      <if test="displayName != null" >
+        display_name,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="effectPicPath != null" >
+        effect_pic_path,
+      </if>
+      <if test="modelId != null" >
+        model_id,
+      </if>
+      <if test="isDel != null" >
+        is_del,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="displayName != null" >
+        #{displayName,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="effectPicPath != null" >
+        #{effectPicPath,jdbcType=VARCHAR},
+      </if>
+      <if test="modelId != null" >
+        #{modelId,jdbcType=VARCHAR},
+      </if>
+      <if test="isDel != null" >
+        #{isDel,jdbcType=SMALLINT},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="update" parameterType="com.rsclouds.gtparallel.entity.ProductLine" >
+    update rsipc_product_line
+    <set >
+      <if test="name != null" >
+        "name" = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="displayName != null" >
+        display_name = #{displayName,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="effectPicPath != null" >
+        effect_pic_path = #{effectPicPath,jdbcType=VARCHAR},
+      </if>
+      <if test="modelId != null" >
+        model_id = #{modelId,jdbcType=VARCHAR},
+      </if>
+      <if test="isDel != null" >
+        is_del = #{isDel,jdbcType=SMALLINT},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+
+</mapper>

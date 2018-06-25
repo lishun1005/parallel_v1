@@ -1,0 +1,30 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>parallel_v1</groupId>
+	<artifactId>parallel_v1</artifactId>
+	<version>0.0.1</version>
+	<packaging>pom</packaging>
+	<name>parallel_v1</name>
+	<description>生产线</description>
+	<repositories>
+		<repository>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<id>public</id>
+			<name>Public Repositories</name>
+			<url>http://192.168.5.81:8081/nexus/content/groups/public/</url>
+		</repository>
+	</repositories>
+	<modules>
+		<module>parallel-parent</module>
+		<module>parallel-gtdata</module>
+		<module>parallel-core</module>
+		<module>parallel-rpc</module>
+		<module>parallel-mgmt</module>
+		<module>parallel-rpc-api</module>
+		<module>parallel-ai-rpc</module>
+		<module>parallel-common</module>
+	</modules>
+</project>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://www.springframework.org/schema/util  http://www.springframework.org/schema/util/spring-util-4.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+	<!-- 凭证匹配器 -->
+	<bean id="credentialsMatcher" class="com.rscloud.ipc.shiro.RetryLimitMatcher">
+		<constructor-arg ref="cacheManager" />
+	</bean>
+	
+	
+	<!-- Realm实现 -->
+	<bean id="userRealm" class="com.rscloud.ipc.shiro.UserRealm">
+		 <property name="cachingEnabled" value="true"/><!--是否启用缓存总开关-->
+		 <property name="cacheManager" ref="cacheManager" />
+		 <property name="credentialsMatcher" ref="credentialsMatcher"/><!-- 验证适配  -->
+		 <!-- 认证缓存 -->
+ 		 <property name="authenticationCachingEnabled" value="true"/>
+ 		 <property name="authenticationCacheName" value="authenticationCache"/> 
+ 		 <!--  授权缓存   -->
+		 <property name="authorizationCachingEnabled" value="true"/> 
+		 <property name="authorizationCacheName" value="authorizationCache"/>
+	</bean>
+	<!--<bean id="cacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager" >
+		<property name="cacheManagerConfigFile" value="classpath*:ehcache.xml"/>
+	</bean>-->
+	<!-- 缓存管理器 使用Ehcache实现 -->
+   <!-- <bean id="cacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager" >
+        <property name="cacheManagerConfigFile" value="classpath:ehcache.xml"/>
+    </bean>
+    <bean id="redisManager" class="org.crazycake.shiro.RedisManager">
+		<property name="host" value="${redis.host}" />
+		<property name="port" value="${redis.port}" />
+		<property name="timeout" value="${redis.timeout}" />
+	</bean> -->
+	<!-- 缓存管理器 使用redis实现 -->
+
+	
+	<!-- 安全管理器 -->
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<property name="cacheManager" ref="cacheManager" />
+		<property name="realm" ref="userRealm" />
+		<property name="sessionManager" ref="sessionManager" />
+		<!--<property name="rememberMeManager" ref="rememberMeManager"/> -->
+	</bean>
+	<!-- 并发登录人数 最多一个用户online -->
+	<bean id="kickoutSessionControlFilter" class="com.rscloud.ipc.shiro.KickoutSessionFilter">
+		<property name="cacheManager" ref="cacheManager"/>
+		<property name="sessionManager" ref="sessionManager"/>
+		<property name="maxSession" value="1"/>
+		<property name="kickoutUrl" value="/login?kickout=1"/>
+	</bean>
+	
+	
+		
+
+    <!-- rememberMe管理器 -->
+	<!--<bean id="rememberMeManager"  class="org.apache.shiro.web.mgt.CookieRememberMeManager">
+	 	<property name="cipherKey" value="#{T(org.apache.shiro.codec.Base64).decode('4AvVhmFLUs0KTA3Kprsdag==')}"/> 
+	 	<property name="cookie" ref="rememberMeCookie"/> 
+	</bean>
+	<bean id="rememberMeCookie" class="org.apache.shiro.web.servlet.SimpleCookie"> 
+	 	<constructor-arg value="ips-user"/> 
+	 	<property name="httpOnly" value="true"/> 
+	 	<property name="maxAge" value="2592000"/>&lt;!&ndash; 30 天 &ndash;&gt;
+	</bean> -->
+	
+	<!-- session 存储到redis -->
+	<bean id="sessionDAO" class="org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO">
+		<property name="cacheManager" ref="cacheManager"/>
+		<property name="activeSessionsCacheName" value="sessionCache"/>
+	</bean>
+	<bean id="simpleCookie" class="org.apache.shiro.web.servlet.SimpleCookie">
+		<constructor-arg name="name" value="shiro.sesssion"/>
+		 <property name="maxAge" value="14400"/><!-- 与redis失效时间一致 解决出现 There is no session with id... -->
+	</bean>
+	<bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
+        <property name="deleteInvalidSessions" value="true"/>
+        <property name="sessionDAO" ref="sessionDAO"/>
+        <property name="sessionIdCookie" ref="simpleCookie"/>
+        <property name="globalSessionTimeout" value="14400000" /><!-- 与redis失效时间一致,若小于resdis缓存时间导致删除redis缓存，从而需要重新登录-->
+    </bean>
+
+	<bean id="cacheManager" class="com.rscloud.ipc.redis.RedisCacheManager" >
+		<property name="redisManager" ref="redisClientTemplate"/>
+		<property name="expireSec" value="14400"/><!-- session 缓存时间为4小时 -->
+	</bean>
+	<!-- 
+		Shiro 的Web过滤器 
+		anon:拦截器表示匿名访问(即不需要登录即可访问)；
+		authc:拦截器表示需要身份认证通过后才能访问；
+		roles[admin]:拦截器表示需要有 admin 角色授权才能访问；
+		perms["user:create"]:拦截器表示需要有“user:create”权限才能访问。
+	-->
+	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<property name="securityManager" ref="securityManager" />
+		<property name="loginUrl" value="/login.html" />
+		<!-- <property name="unauthorizedUrl" value="/unauthorized.html" /> -->
+		<property name="filters">
+			<util:map>
+				<entry key="kickout" value-ref="kickoutSessionControlFilter"/>
+			</util:map>
+		</property>
+		<property name="filterChainDefinitions">
+			<value>
+				/plugins/** = anon
+				/main/** = anon
+				/img/** = anon
+				/login = anon
+				/unauthorized* = anon
+				/favicon.ico = anon
+				/logout* = anon
+				/api/**=anon
+				/callback/**=anon
+   				/** = kickout,user 
+			</value>
+		</property>
+	</bean>
+	
+	<!-- 相当于调用SecurityUtils.setSecurityManager(securityManager) -->
+	<bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="staticMethod" value="org.apache.shiro.SecurityUtils.setSecurityManager" />
+		<property name="arguments" ref="securityManager" />
+	</bean>
+
+	<!-- 
+		Shiro生命周期处理器
+		用于在实现了 Initializable 接口的 Shiro bean 初始化时调用Initializable 接口回调，
+		在实现了 Destroyable 接口的 Shiro bean 销毁时调用 Destroyable 接口回调。
+		如 UserRealm 就实现了 Initializable，而 DefaultSecurityManager 实现了 Destroyable
+	 -->
+	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor" />
+
+	<bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+		<property name="securityManager" ref="securityManager" />
+	</bean>
+
+</beans>

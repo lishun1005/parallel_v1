@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+	<bean id="changeDetetionService" class="com.rsclouds.gtparallel.service.impl.ChangeDetetionServiceImpl" />
+	<dubbo:service interface="com.rscloud.ipc.rpc.api.service.ChangeDetetionService" ref="changeDetetionService" protocol="dubbo" />
+
+	<bean id="algorithmService" class="com.rsclouds.gtparallel.service.impl.AlgorithmServiceImpl" />
+	<dubbo:service interface="com.rscloud.ipc.rpc.api.service.AlgorithmService" ref="algorithmService" protocol="dubbo" />
+
+	<bean id="hbaseTableService" class="com.rsclouds.gtparallel.service.impl.HbaseTableServiceImpl" />
+	<dubbo:service interface="com.rscloud.ipc.rpc.api.service.HbaseTableService" ref="hbaseTableService" protocol="dubbo" />
+
+	<bean id="productlineService" class="com.rsclouds.gtparallel.service.impl.ProductLineServiceImpl" />
+	<dubbo:service interface="com.rscloud.ipc.rpc.api.service.ProductlineService" ref="productlineService" protocol="dubbo" />
+
+	<bean id="optimalModelService" class="com.rsclouds.gtparallel.service.impl.OptimalModelServiceImpl" />
+	<dubbo:service interface="com.rscloud.ipc.rpc.api.service.OptimalModelService" ref="optimalModelService" protocol="dubbo" />
+
+	<bean id="areaInfoService" class="com.rsclouds.gtparallel.service.impl.AreaInfoServiceImpl" />
+	<dubbo:service interface="com.rscloud.ipc.rpc.api.service.AreaInfoService" ref="areaInfoService" protocol="dubbo" />
+
+	<bean id="areaImageService" class="com.rsclouds.gtparallel.service.impl.AreaImageServiceImpl" />
+	<dubbo:service interface="com.rscloud.ipc.rpc.api.service.AreaImageService" ref="areaImageService" protocol="dubbo" />
+
+	<!-- 系统管理相关rpc -->
+	<bean id="sysUserService" class="com.rsclouds.gtparallel.service.impl.SysUserServiceImpl" />
+	<dubbo:service interface="com.rscloud.ipc.rpc.api.service.SysUserService" ref="sysUserService" protocol="dubbo" />
+
+	<bean id="sysRoleService" class="com.rsclouds.gtparallel.service.impl.SysRoleServiceImpl" />
+	<dubbo:service interface="com.rscloud.ipc.rpc.api.service.SysRoleService" ref="sysRoleService" protocol="dubbo" />
+
+	<bean id="sysMenuService" class="com.rsclouds.gtparallel.service.impl.SysMenuServiceImpl" />
+	<dubbo:service interface="com.rscloud.ipc.rpc.api.service.SysMenuService" ref="sysMenuService" protocol="dubbo" />
+
+	<!-- End 系统管理相关rpc -->
+	<bean id="satelliteService" class="com.rsclouds.gtparallel.service.impl.SatelliteServiceImpl" />
+	<dubbo:service interface="com.rscloud.ipc.rpc.api.service.SatelliteService" ref="satelliteService" protocol="dubbo" />
+
+	<!-- 一张图切片 rpc -->
+	<bean id="cutService" class="com.rsclouds.gtparallel.service.impl.CutServiceImpl" />
+	<dubbo:service interface="com.rscloud.ipc.rpc.api.service.CutService"  ref="cutService" protocol="dubbo" />
+	<!-- End 一张图切片 rpc -->
+
+	<!-- 镶嵌 rpc -->
+	<bean id="mosaicService" class="com.rsclouds.gtparallel.service.impl.MosaicServiceImpl" />
+	<dubbo:service interface="com.rscloud.ipc.rpc.api.service.MosaicService"  ref="mosaicService" protocol="dubbo" />
+	<!-- End 镶嵌 rpc -->
+</beans>

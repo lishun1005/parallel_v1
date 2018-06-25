@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper  
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rsclouds.gtparallel.dao.SysRoleMenuDao">
+
+	<resultMap id="sysRoleMenuResultMap" type="com.rscloud.ipc.rpc.api.dto.SysRoleMenuDto">
+		<id column="role_id" property="roleId" jdbcType="CHAR" />
+		<id column="menu_id" property="menuId" jdbcType="CHAR" />
+		<result column="permission_level" property="permissionLevel"
+			jdbcType="VARCHAR" />
+	</resultMap>
+
+	<insert id="add" parameterType="SysRoleMenu">
+		insert into rscipc_sys_role_menu
+		(role_id, menu_id, permission_level
+		)
+		values (#{roleId,jdbcType=CHAR},
+		#{menuId,jdbcType=CHAR},
+		#{permissionLevel,jdbcType=VARCHAR}
+		)
+	</insert>
+
+	<delete id="deleteByRoleId" parameterType="java.lang.String">
+		delete from
+		rscipc_sys_role_menu
+		where role_id = #{roleId,jdbcType=CHAR}
+	</delete>
+
+
+	<select id="findByRoleId" resultMap="sysRoleMenuResultMap"
+		parameterType="java.lang.String">
+		select * from rscipc_sys_role_menu where role_id =
+		#{roleId,jdbcType=CHAR}
+	</select>
+
+</mapper>  

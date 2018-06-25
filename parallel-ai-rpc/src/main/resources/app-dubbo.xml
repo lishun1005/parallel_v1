@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+	<dubbo:application name="ipc-rpc" logger="slf4j" />
+	<!--<dubbo:annotation package="com.rscloud.ipc" />-->
+	<dubbo:registry protocol="${dubbo.registry.protocol}" address="${dubbo.registry.address}" />
+	<!--<dubbo:protocol name="dubbo" port="${dubbo.port}" />-->
+	<!-- 延迟到Spring初始化完成后，再暴露服务,服务调用超时设置为58分钟,超时不重试 -->
+	<dubbo:provider  delay="-1" port="${dubbo.protocol.port}" timeout="60000" retries="0" accepts="200"/>
+	<import resource="app-dubbo-bean.xml"/>
+		
+</beans>

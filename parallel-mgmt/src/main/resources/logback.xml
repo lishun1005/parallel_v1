@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS}-[%-5level]-%logger{36}.%M:%m%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="rollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/tmp/ipc/mgmt/log.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>/tmp/ipc/mgmt/log.%d{yyyy-MM-dd}-%i.log</fileNamePattern>
+            <TimeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <MaxFileSize>100mb</MaxFileSize>
+            </TimeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <logger name="org.springframework" level="warn"></logger>
+    
+ 	<logger name="com.rscloud.ipc.dao" level="debug"></logger>
+     <logger name="com.rscloud.ipc.redis" level="debug" />
+
+	<logger name="org.apache.zookeeper" level="warn" />
+
+	<logger name="com.alibaba.dubbo" level="INFO" />
+	<logger name="com.alibaba.dubbo.config" level="warn" />
+	<logger name="com.rscloud.ipc.redis" level="info" />
+	<logger name="org.apache.shiro" level="info" />
+    <logger name="com.alibaba.dubbo.registry.zookeeper" level="warn"></logger>
+    <logger name="springfox.documentation.spring" level="warn"></logger>
+
+	<logger name="org.dozer.jmx" level="warn"></logger>
+    <logger name="org.dozer" level="warn"></logger>
+	<root level="info" >
+		<appender-ref ref="console" />
+		<appender-ref ref="rollingFile"/>
+	</root>
+</configuration>

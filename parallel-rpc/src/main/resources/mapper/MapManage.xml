@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rsclouds.gtparallel.dao.MapManageDao">
+  <resultMap id="BaseResultMap" type="MapManage">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="map_name" jdbcType="VARCHAR" property="mapName" />
+    <result column="show_max_layers" jdbcType="VARCHAR" property="showMaxLayers" />
+    <result column="project" jdbcType="VARCHAR" property="project" />
+    <result column="usage" jdbcType="VARCHAR" property="usage" />
+    <result column="water_mark" jdbcType="SMALLINT" property="waterMark" />
+    <result column="range" jdbcType="VARCHAR" property="range" />
+    <result column="out_path" jdbcType="VARCHAR" property="outPath" />
+    <result column="owner_user_id" jdbcType="VARCHAR" property="ownerUserId" />
+    <result column="service_type" jdbcType="VARCHAR" property="serviceType" />
+    <result column="geo_range" jdbcType="VARCHAR" property="geoRange" />
+    <result column="format" jdbcType="VARCHAR" property="format" />
+    <result column="is_publish" jdbcType="SMALLINT" property="isPublish" />
+  </resultMap>
+  <sql id="column_List">
+    rmm.id,  rmm.map_name as mapName,  rmm.show_max_layers as showMaxLayers,  rmm.project,  rmm."usage",  
+    rmm.water_mark as waterMark, rmm."range",  rmm.service_type as serviceType,  rmm.geo_range as geoRange,  
+    rmm.format,  rmm.is_publish as isPublish,  rmm.out_path as outPath, rmm.owner_user_id as ownerUserId
+  </sql>
+ <select id="queryById" resultType="MapManage">
+ 	select <include refid="column_List" /> from rscipc_map_manage rmm where id=#{id}
+ </select>
+ <select id="queryAll" resultType="map" >
+		select rmm.*,rsu.username from rscipc_map_manage rmm 
+		left join rscipc_sys_user rsu on rsu.id=rmm.owner_user_id
+		<where>
+			<if test="keyword!=null and keyword!=''">
+				<bind name="keyword" value="'%' + keyword + '%'" />
+				and (rsu.username like #{keyword} or rmm.map_name like #{keyword})
+			</if>
+			<if test="userName!=null and userName!=''">
+				and rsu.username = #{userName}
+			</if>
+			and is_del=0
+		</where>
+		
+		order by ct_time desc
+  </select>
+  <delete id="deleteById" parameterType="java.lang.String">
+    delete from rscipc_map_manage
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  
+  <insert id="insert" parameterType="MapManage">
+    insert into rscipc_map_manage
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="mapName != null">
+        map_name,
+      </if>
+      <if test="showMaxLayers != null">
+        show_max_layers,
+      </if>
+      <if test="project != null">
+        project,
+      </if>
+      <if test="usage != null">
+        "usage",
+      </if>
+      <if test="waterMark != null">
+        water_mark,
+      </if>
+      <if test="range != null">
+        "range",
+      </if>
+      <if test="outPath != null">
+        out_path,
+      </if>
+      <if test="ownerUserId != null">
+        owner_user_id,
+      </if>
+       <if test="ctTime != null">
+        ct_time,
+      </if>
+       <if test="utTime != null">
+        ut_time,
+      </if>
+      <if test="serviceType != null">
+      	service_type,
+      </if>
+      <if test="geoRange != null">
+      	geo_range,
+      </if>
+      <if test="format != null">
+      	format,
+      </if>
+      <if test="isPublish != null">
+      	is_publish,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="mapName != null">
+        #{mapName,jdbcType=VARCHAR},
+      </if>
+      <if test="showMaxLayers != null">
+        #{showMaxLayers,jdbcType=VARCHAR},
+      </if>
+      <if test="project != null">
+        #{project,jdbcType=VARCHAR},
+      </if>
+      <if test="usage != null">
+        #{usage,jdbcType=VARCHAR},
+      </if>
+      <if test="waterMark != null">
+        #{waterMark,jdbcType=SMALLINT},
+      </if>
+      <if test="range != null">
+        #{range,jdbcType=VARCHAR},
+      </if>
+      <if test="outPath != null">
+        #{outPath,jdbcType=VARCHAR},
+      </if>
+      <if test="ownerUserId != null">
+        #{ownerUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="utTime != null">
+         #{utTime,jdbcType=DATE},
+      </if>
+      <if test="ctTime != null">
+         #{ctTime,jdbcType=DATE},
+      </if>
+      <if test="serviceType != null">
+      	#{serviceType,jdbcType=VARCHAR},
+      </if>
+      <if test="geoRange != null">
+      	#{geoRange,jdbcType=VARCHAR},
+      </if>
+      <if test="format != null">
+      	#{format,jdbcType=VARCHAR},
+      </if>
+      <if test="isPublish != null">
+      	#{isPublish,jdbcType=SMALLINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateById" parameterType="MapManage">
+    update rscipc_map_manage
+    <set>
+      <if test="mapName != null">
+        map_name = #{mapName,jdbcType=VARCHAR},
+      </if>
+      <if test="showMaxLayers != null">
+        show_max_layers = #{showMaxLayers,jdbcType=VARCHAR},
+      </if>
+      <if test="project != null">
+        project = #{project,jdbcType=VARCHAR},
+      </if>
+      <if test="usage != null">
+        "usage" = #{usage,jdbcType=VARCHAR},
+      </if>
+      <if test="waterMark != null">
+        water_mark = #{waterMark,jdbcType=SMALLINT},
+      </if>
+      <if test="range != null">
+        "range" = #{range,jdbcType=VARCHAR},
+      </if>
+      <if test="outPath != null">
+        out_path = #{outPath,jdbcType=VARCHAR},
+      </if>
+      <if test="ownerUserId != null">
+        owner_user_id = #{ownerUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="ctTime != null">
+         ct_time = #{ctTime,jdbcType=DATE},
+      </if>
+      <if test="utTime != null">
+         ut_time = #{utTime,jdbcType=DATE},
+      </if>
+      <if test="isDel != null">
+         is_del = #{isDel,jdbcType=SMALLINT},
+      </if>
+      <if test="geoRange != null">
+         geo_range = #{geoRange,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  
+  <select id="isExistMapName" resultType="MapManage">
+  	select   <include refid="column_List" /> from rscipc_map_manage rmm  
+	LEFT JOIN rscipc_cut_job rcj on rcj.map_id=rmm.id
+	LEFT JOIN rscipc_cut_job_log rcjl on rcj.map_id=rmm.id
+	where rmm.map_name=#{mapName,jdbcType=VARCHAR} and (rcj.status='SUCCEEDED' or rcjl.status='SUCCEEDED' ) AND rmm.is_del=0  limit 1
+  </select>
+  
+  <select id="isExistOutPath" resultType="int">
+  	select count(*) from rscipc_map_manage where out_path=#{outPath,jdbcType=VARCHAR} AND is_del=0
+  </select>
+</mapper>

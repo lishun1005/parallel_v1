@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rsclouds.gtparallel.dao.AlgorithmDao">
+  <resultMap id="algorithmMap" type="Algorithm">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="display_name" jdbcType="VARCHAR" property="displayName" />
+    <result column="is_del" jdbcType="SMALLINT" property="isDel" />
+  </resultMap>
+  <sql id="column_name">
+    id, "name", display_name, is_del, create_time
+  </sql>
+  <select id="queryAll" resultMap="algorithmMap">
+    select 
+    <include refid="column_name" />
+    from rsipc_algorithm ra
+    <where>
+      <if test="keyword!=null and keyword!=''">
+        <bind name="keyword" value="'%' + keyword + '%'" />
+        and (ra.name like #{keyword} or ra.display_name like #{keyword})
+      </if>
+      and ra.is_del=0
+    </where>
+  </select>
+  <insert id="insert" parameterType="Algorithm" >
+    insert into rsipc_algorithm
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        "name",
+      </if>
+      <if test="displayName != null" >
+        display_name,
+      </if>
+      <if test="isDel != null" >
+        is_del,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="displayName != null" >
+        #{displayName,jdbcType=VARCHAR},
+      </if>
+      <if test="isDel != null" >
+        #{isDel,jdbcType=SMALLINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="update" parameterType="Algorithm" >
+    update rsipc_algorithm
+    <set >
+      <if test="name != null" >
+        "name" = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="displayName != null" >
+        display_name = #{displayName,jdbcType=VARCHAR},
+      </if>
+      <if test="isDel != null" >
+        is_del = #{isDel,jdbcType=SMALLINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+
+</mapper>

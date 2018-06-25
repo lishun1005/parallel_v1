@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rsclouds.ai.mapper.AiModelFileMapper" >
+  <resultMap id="BaseResultMap" type="com.rscloud.ipc.rpc.api.entity.AiModelFile" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="path" property="path" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="SMALLINT" />
+    <result column="ai_model_id" property="aiModelId" jdbcType="VARCHAR" />
+    <result column="ct_tmie" property="ctTmie" jdbcType="TIMESTAMP" />
+    <result column="is_del" property="isDel" jdbcType="SMALLINT" />
+    <result column="file_name" property="fileName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, "path", "type", ai_model_id, ct_tmie, is_del, file_name
+  </sql>
+  <select id="selectByAiModelId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from rscipc_ai_model_file
+    where ai_model_id = #{aiModelId,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectById" resultMap="BaseResultMap"   >
+    select
+    <include refid="Base_Column_List" />
+    from rscipc_ai_model_file
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+
+  <delete id="delete" parameterType="java.lang.String" >
+    delete from rscipc_ai_model_file
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.rscloud.ipc.rpc.api.entity.AiModelFile" >
+    insert into rscipc_ai_model_file
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="path != null" >
+        "path",
+      </if>
+      <if test="type != null" >
+        "type",
+      </if>
+      <if test="aiModelId != null" >
+        ai_model_id,
+      </if>
+      <if test="ctTmie != null" >
+        ct_tmie,
+      </if>
+      <if test="isDel != null" >
+        is_del,
+      </if>
+      <if test="fileName != null" >
+        file_name,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="path != null" >
+        #{path,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=SMALLINT},
+      </if>
+      <if test="aiModelId != null" >
+        #{aiModelId,jdbcType=VARCHAR},
+      </if>
+      <if test="ctTmie != null" >
+        #{ctTmie,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isDel != null" >
+        #{isDel,jdbcType=SMALLINT},
+      </if>
+      <if test="fileName != null" >
+        #{fileName,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+
+</mapper>

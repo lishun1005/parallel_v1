@@ -34,4 +34,3 @@ jsonFile/*
 *.tmp
 *.java~
 *.properties~
-*.xml

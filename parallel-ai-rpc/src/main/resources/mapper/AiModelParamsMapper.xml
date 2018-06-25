@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rsclouds.ai.mapper.AiModelParamsMapper" >
+  <resultMap id="BaseResultMap" type="com.rscloud.ipc.rpc.api.entity.AiModelParams" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="ai_model_id" property="aiModelId" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="SMALLINT" />
+    <result column="ct_time" property="ctTime" jdbcType="TIMESTAMP" />
+    <result column="is_del" property="isDel" jdbcType="SMALLINT" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, ai_model_id, "name", "type", ct_time, is_del,remark
+  </sql>
+
+  <select id="queryByAiModelId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from rscipc_ai_model_params
+    where ai_model_id = #{aiModelId,jdbcType=VARCHAR}
+  </select>
+
+  <select id="delByAiModelId"  parameterType="java.lang.String" >
+    delete  from rscipc_ai_model_params
+    where ai_model_id = #{aiModelId,jdbcType=VARCHAR}
+  </select>
+
+  <insert id="insertBatch" parameterType="com.rscloud.ipc.rpc.api.entity.AiModelParams" >
+    insert into rscipc_ai_model_params(id,name,type,ai_model_id,remark)
+    VALUES
+    <foreach collection="list" item="aiModelParams" separator="," >
+      (#{aiModelParams.id},#{aiModelParams.name},#{aiModelParams.type},#{aiModelParams.aiModelId},#{aiModelParams.remark})
+    </foreach>
+
+  </insert>
+  <update id="update" parameterType="com.rscloud.ipc.rpc.api.entity.AiModelParams" >
+    update rscipc_ai_model_params
+    <set >
+      <if test="aiModelId != null" >
+        ai_model_id = #{aiModelId,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        "name" = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        "type" = #{type,jdbcType=SMALLINT},
+      </if>
+      <if test="ctTime != null" >
+        ct_time = #{ctTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isDel != null" >
+        is_del = #{isDel,jdbcType=SMALLINT},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

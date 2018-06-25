@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rsclouds.ai.mapper.AiVmMapper" >
+  <resultMap id="AiVmMap" type="com.rscloud.ipc.rpc.api.entity.AiVm" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="ip_addr" property="ipAddr" jdbcType="VARCHAR" />
+    <result column="max_jobs" property="maxJobs" jdbcType="INTEGER" />
+    <result column="is_del" property="isDel" jdbcType="SMALLINT" />
+    <result column="ct_time" property="ctTime" jdbcType="TIMESTAMP" />
+    <result column="ut_time" property="utTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="column_name" >
+    id, ip_addr, max_jobs, is_del, ct_time, ut_time
+  </sql>
+  <select id="queryAll" resultMap="AiVmMap"  >
+    select 
+    <include refid="column_name" />
+    from rscipc_ai_vm
+    <where>
+      <if test="keyword!=null and keyword!=''">
+        <bind name="keyword" value="'%' + keyword + '%'" />
+        and (ip_addr like #{keyword})
+      </if>
+      and is_del=0
+    </where>
+  </select>
+
+  <insert id="insert" parameterType="com.rscloud.ipc.rpc.api.entity.AiVm" >
+    insert into rscipc_ai_vm
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="ipAddr != null" >
+        ip_addr,
+      </if>
+      <if test="maxJobs != null" >
+        max_jobs,
+      </if>
+      <if test="isDel != null" >
+        is_del,
+      </if>
+      <if test="ctTime != null" >
+        ct_time,
+      </if>
+      <if test="utTime != null" >
+        ut_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="ipAddr != null" >
+        #{ipAddr,jdbcType=VARCHAR},
+      </if>
+      <if test="maxJobs != null" >
+        #{maxJobs,jdbcType=INTEGER},
+      </if>
+      <if test="isDel != null" >
+        #{isDel,jdbcType=SMALLINT},
+      </if>
+      <if test="ctTime != null" >
+        #{ctTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="utTime != null" >
+        #{utTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="update" parameterType="com.rscloud.ipc.rpc.api.entity.AiVm" >
+    update rscipc_ai_vm
+    <set >
+      <if test="ipAddr != null" >
+        ip_addr = #{ipAddr,jdbcType=VARCHAR},
+      </if>
+      <if test="maxJobs != null" >
+        max_jobs = #{maxJobs,jdbcType=INTEGER},
+      </if>
+      <if test="isDel != null" >
+        is_del = #{isDel,jdbcType=SMALLINT},
+      </if>
+      <if test="ctTime != null" >
+        ct_time = #{ctTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="utTime != null" >
+        ut_time = #{utTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+
+  <!-- rscipc_ai_job_vm_port -->
+  <insert id="aiJobVmPortAdd"  >
+    insert into rscipc_ai_job_vm_port
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="jodid != null" >
+        jodid,
+      </if>
+      <if test="vmPortId != null" >
+        vm_port_id,
+      </if>
+      <if test="vmType != null" >
+        vm_type,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="jodid != null" >
+        #{jodid,jdbcType=VARCHAR},
+      </if>
+      <if test="vmPortId != null" >
+        #{vmPortId,jdbcType=VARCHAR},
+      </if>
+      <if test="vmType != null" >
+        #{vmType,jdbcType=SMALLINT},
+      </if>
+    </trim>
+  </insert>
+  <!-- end -->
+
+  <!-- rscipc_ai_vm_instance_port -->
+  <insert id="aiVmInstancePortAdd" parameterType="com.rscloud.ipc.rpc.api.entity.AiVmInstancePort" >
+    insert into rscipc_ai_vm_instance_port
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="vmId != null" >
+        vm_id,
+      </if>
+      <if test="vmPort != null" >
+        vm_port,
+      </if>
+      <if test="isUse != null" >
+        is_use,
+      </if>
+      <if test="isDel != null" >
+        is_del,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="vmId != null" >
+        #{vmId,jdbcType=VARCHAR},
+      </if>
+      <if test="vmPort != null" >
+        #{vmPort,jdbcType=INTEGER},
+      </if>
+      <if test="isUse != null" >
+        #{isUse,jdbcType=SMALLINT},
+      </if>
+      <if test="isDel != null" >
+        #{isDel,jdbcType=SMALLINT},
+      </if>
+    </trim>
+  </insert>
+
+  <select id="selectAiVmInstancePortByVmIdAndPort" resultType="com.rscloud.ipc.rpc.api.entity.AiVmInstancePort">
+    select id, vm_id, vm_port, is_use, ct_time, is_del
+    from rscipc_ai_vm_instance_port
+    where vm_id = #{vmId,jdbcType=VARCHAR} and vm_port = #{vmPort,jdbcType=VARCHAR} and is_del = 0
+  </select>
+
+  <update id="updateAiVmInstancePort"  >
+    update rscipc_ai_vm_instance_port
+    <set >
+      <if test="vmId != null" >
+        vm_id = #{vmId,jdbcType=VARCHAR},
+      </if>
+      <if test="vmPort != null" >
+        vm_port = #{vmPort,jdbcType=INTEGER},
+      </if>
+      <if test="isUse != null" >
+        is_use = #{isUse,jdbcType=SMALLINT},
+      </if>
+      <if test="isDel != null" >
+        is_del = #{isDel,jdbcType=SMALLINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <!-- end -->
+</mapper>

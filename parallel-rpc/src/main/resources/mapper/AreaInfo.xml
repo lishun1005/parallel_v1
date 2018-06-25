@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rsclouds.gtparallel.dao.AreaInfoDao">
+	<resultMap id="areasList" type="com.rscloud.ipc.rpc.api.dto.AreasList">
+		<result column="admincode" property="adminId" jdbcType="VARCHAR" />
+		<result column="pinyin" property="namePY" jdbcType="VARCHAR" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<select id="getDirectSubAreas" resultMap="areasList">
+		select admincode,name as name, pinyin as namepy
+				 from rscipc_area_info where admincode &lt;&gt; #{parentId} and admincode like 
+				CASE WHEN #{parentId} = '000000' THEN '%0000' 
+				WHEN substring(#{parentId}, 3, 4) = '0000' THEN substring(#{parentId}, 1, 2)||'%'||substring(#{parentId}, 5, 2) 
+				ELSE substring(#{parentId}, 1, 4)||'%' END 
+				order by pinyin
+	</select>
+  <select id="getProvince" resultType="Map">
+  	 select admincode,name from rscipc_area_info  where  proadcode is null and cityadcode is null and name not like '%水系%' and admincode!='000000'  
+  </select>
+  <select id="queryGeomByAreaCode" parameterType="string" resultType="String">
+		select st_asgeojson(geom,16,0) geom from rscipc_area_info
+		where admincode = #{admincode}
+	</select>
+</mapper>  

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rsclouds.ai.mapper.AiModelMapper" >
+  <resultMap id="BaseResultMap" type="com.rscloud.ipc.rpc.api.entity.AiModel" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="logdir" property="logdir" jdbcType="VARCHAR" />
+    <result column="ct_time" property="ctTime" jdbcType="TIMESTAMP" />
+    <result column="ut_time" property="utTime" jdbcType="TIMESTAMP" />
+    <result column="is_del" property="isDel" jdbcType="SMALLINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, "name", logdir, ct_time, ut_time, is_del
+  </sql>
+  <select id="queryAll" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />
+    from rscipc_ai_model
+    <where>
+      <if test="keyword!=null and keyword!=''">
+        <bind name="keyword" value="'%' + keyword + '%'" />
+        and (name like #{keyword})
+      </if>
+      and is_del=0
+    </where>
+    order BY ut_time DESC
+  </select>
+  <select id="findAiModelById" resultType="AiModel">
+    select
+    <include refid="Base_Column_List" />
+    from rscipc_ai_model WHERE id = #{id} and is_del=0
+  </select>
+
+  <select id="findAiModelByName" resultType="AiModel">
+    select
+    <include refid="Base_Column_List" />
+    from rscipc_ai_model WHERE name = #{name} and is_del=0
+  </select>
+
+
+  <insert id="insert" parameterType="com.rscloud.ipc.rpc.api.entity.AiModel" >
+    insert into rscipc_ai_model
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        "name",
+      </if>
+      <if test="logdir != null" >
+        logdir,
+      </if>
+      <if test="ctTime != null" >
+        ct_time,
+      </if>
+      <if test="utTime != null" >
+        ut_time,
+      </if>
+      <if test="isDel != null" >
+        is_del,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="logdir != null" >
+        #{logdir,jdbcType=VARCHAR},
+      </if>
+      <if test="ctTime != null" >
+        #{ctTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="utTime != null" >
+        #{utTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isDel != null" >
+        #{isDel,jdbcType=SMALLINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="update" parameterType="com.rscloud.ipc.rpc.api.entity.AiModel" >
+    update rscipc_ai_model
+    <set >
+      <if test="name != null" >
+        "name" = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="logdir != null" >
+        logdir = #{logdir,jdbcType=VARCHAR},
+      </if>
+
+      <if test="ctTime != null" >
+        ct_time = #{ctTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="utTime != null" >
+        ut_time = #{utTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isDel != null" >
+        is_del = #{isDel,jdbcType=SMALLINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+
+</mapper>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
+<generatorConfiguration>
+    <!--
+        defaultModelType="flat" 只生成一个实体类
+        targetRuntime="MyBatis3Simple" 不生成有关Example的内容
+    -->
+    <context id="context1" targetRuntime="MyBatis3" defaultModelType="flat">
+
+        <property name="autoDelimitKeywords" value="true"/><!-- 当表或者字段名是数据库关键字时，加上双引号 -->
+        <commentGenerator>
+            <property name="suppressAllComments" value="true"/> <!-- 不生成注释文件 -->
+        </commentGenerator>
+        <jdbcConnection driverClass="org.postgresql.Driver" connectionURL="jdbc:postgresql://127.0.0.1:5432/test"
+                        userId="postgres" password="123" />
+
+        <javaModelGenerator targetPackage="com.rsclouds.gtparallel.entity" targetProject="src\main\java" />
+        <sqlMapGenerator targetPackage="mapper" targetProject="src\main\resources" />
+
+        <javaClientGenerator targetPackage="com.rsclouds.gtparallel.dao"  targetProject="src\main\java" type="XMLMAPPER" />
+        <!--
+         	type="XMLMAPPER":所有sql都在xml文件中
+         	type="ANNOTATEDMAPPER":基于注解的sql
+         	mapperName="RscbBooksInfoDao"
+         -->
+        <table  tableName="rsipc_product_line" enableCountByExample="false"
+                enableDeleteByExample="false" enableSelectByExample="false"
+                enableUpdateByExample="false" >
+        </table>
+    </context>
+
+</generatorConfiguration>

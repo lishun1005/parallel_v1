@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper  
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rsclouds.gtparallel.dao.SysMenuDao">
+	<resultMap id="sysMenuResultMap" type="com.rscloud.ipc.rpc.api.dto.SysMenuDto">
+		<id column="id" property="id" jdbcType="CHAR" />
+		<result column="z_index" property="zIndex" jdbcType="SMALLINT" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="url" property="url" jdbcType="VARCHAR" />
+		<result column="parent_id" property="parentId" jdbcType="CHAR" />
+		<result column="sequence" property="sequence" jdbcType="SMALLINT" />
+		<result column="icon" property="icon" jdbcType="VARCHAR" />
+		<result column="permission" property="permission" jdbcType="VARCHAR" />
+		<result column="is_show" property="isShow" jdbcType="BIT" />
+		<result column="menu_type" property="menuType" jdbcType="CHAR" />
+		
+	</resultMap>
+	<select id="queryByUrl" resultMap="sysMenuResultMap" parameterType="String">
+		select permission,name,url from rscipc_sys_menu where trim(both '/' from url)=#{url}
+	</select>
+	<update id="updateByPrimaryKeySelective" parameterType="SysMenu">
+		update rscipc_sys_menu
+		<set>
+			<if test="zIndex != null">
+				z_index = #{zIndex,jdbcType=SMALLINT},
+			</if>
+			<if test="name != null">
+				name = #{name,jdbcType=VARCHAR},
+			</if>
+			<if test="url != null">
+				url = #{url,jdbcType=VARCHAR},
+			</if>
+			<if test="parentId != null">
+				parent_id = #{parentId,jdbcType=CHAR},
+			</if>
+			
+			<if test="sequence != null">
+				sequence = #{sequence,jdbcType=SMALLINT},
+			</if>
+			<if test="icon != null">
+				icon = #{icon,jdbcType=VARCHAR},
+			</if>
+			<if test="permission != null">
+				permission = #{permission,jdbcType=VARCHAR},
+			</if>
+			<if test="isShow != null">
+				is_show = #{isShow,jdbcType=BIT},
+			</if>
+			<if test="menuType != null">
+				menu_type = #{menuType,jdbcType=CHAR},
+			</if>
+		</set>
+		where id = #{id,jdbcType=CHAR}
+	</update>
+
+</mapper>  

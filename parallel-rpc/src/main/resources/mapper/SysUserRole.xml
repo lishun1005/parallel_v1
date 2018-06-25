@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper  
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rsclouds.gtparallel.dao.SysUserRoleDao">
+	<resultMap id="BaseResultMap" type="SysUserRole">
+		<id column="user_id" property="userId" jdbcType="CHAR" />
+		<id column="role_id" property="roleId" jdbcType="CHAR" />
+	</resultMap>
+
+	<insert id="add" parameterType="SysUserRole">
+		insert into rscipc_sys_user_role
+		(user_id, role_id)
+		values (#{userId,jdbcType=CHAR},
+		#{roleId,jdbcType=CHAR})
+	</insert>
+
+
+	<delete id="delete" parameterType="SysUserRole">
+		delete from rscipc_sys_user_role
+		where user_id = #{userId,jdbcType=CHAR}
+		and role_id =
+		#{roleId,jdbcType=CHAR}
+	</delete>
+
+
+</mapper>  

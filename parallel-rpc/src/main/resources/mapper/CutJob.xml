@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rsclouds.gtparallel.dao.CutJobDao">
+
+  <resultMap id="cutJobMap" type="CutJobLazyLoadTest">
+    <id column="id" jdbcType="CHAR" property="id" />
+    <result column="in_path" jdbcType="VARCHAR" property="inPath" />
+    <result column="map_id" jdbcType="VARCHAR" property="mapId" />
+    <result column="max_layers" jdbcType="VARCHAR" property="maxLayers" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="jobid" jdbcType="VARCHAR" property="jobid" />
+    <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="accept_time" jdbcType="TIMESTAMP" property="acceptTime" />
+    <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+    <result column="is_cover" jdbcType="BIT" property="isCover" />
+    <result column="progress" jdbcType="NUMERIC" property="progress" />
+    <association property="mapManage" javaType="MapManage" select="com.rsclouds.gtparallel.dao.MapManageDao.queryById"
+                 column="map_id">
+
+    </association>
+  </resultMap>
+
+
+  <select id="queryAllLazyLoad" resultMap="cutJobMap" >
+    select * from rscipc_cut_job
+  </select>
+
+  <select id="queryAll" resultType="map" >
+		select rcj.jobid,rcj.job_name,rcj.status,rcj.id,rmm.map_name,rmm.usage,rmm.usage,rcj.progress,
+		rcj.accept_time,rcj.start_time,rcj.end_time,rcj.cut_type
+		from rscipc_cut_job rcj 
+		left join rscipc_map_manage rmm on rmm.id=rcj.map_id
+		LEFT JOIN rscipc_sys_user rsu on rsu.id=rmm.owner_user_id
+		<where>
+			<if test="keyword!=null and keyword!=''">
+				<bind name="keyword" value="'%' + keyword + '%'" />
+				and (rmm.map_name like #{keyword} or rcj.job_name like #{keyword})
+			</if>
+			<if test="status!=null and status!=''">
+				and (rcj.status=#{status,jdbcType=VARCHAR})
+			</if>
+			<if test="userName!=null and userName!=''">
+				and (rsu.username=#{userName})
+			</if>
+			and rcj.is_del=0
+		</where>
+		order by accept_time desc
+  </select>
+
+  <select id="querylog" resultType="map" >
+		select * from rscipc_cut_job_log where cut_id=#{cut_id}
+  </select>
+ 
+  <select id="queryById" resultType="map" >
+		select rcj.*,rmm.map_name,rmm.out_path,rmm.water_mark,rsu.username as operationname,rsu1.username as ownername,rmm.usage
+		from rscipc_cut_job rcj 
+		left join rscipc_sys_user rsu on rsu.id=rcj.operation_user_id
+		left join rscipc_map_manage rmm on rmm.id=rcj.map_id
+		LEFT JOIN rscipc_sys_user rsu1 on rsu1.id=rmm.owner_user_id
+		<where>
+			rcj.id=#{id}
+		</where>
+  </select>
+  <update id="update" parameterType="CutJob">
+    update rscipc_cut_job
+    <set>
+      <if test="inPath != null">
+        in_path = #{inPath,jdbcType=VARCHAR},
+      </if>
+      <if test="maxLayers != null">
+        max_layers = #{maxLayers,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        "status" = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null">
+        start_time = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="acceptTime != null">
+        accept_time = #{acceptTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null">
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isCover != null">
+       is_Cover=#{isCover,jdbcType=BIT},
+      </if>
+      <if test="priority != null">
+       priority=#{priority,jdbcType=BIT},
+      </if>
+      <if test="progress != null">
+       progress=#{progress,jdbcType=NUMERIC},
+      </if>
+      <if test="log != null">
+       log=#{log,jdbcType=VARCHAR},
+      </if>
+      <if test="geowebcacheUrl != null">
+       geowebcache_url=#{geowebcacheUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="isDel != null">
+       is_del=#{isDel,jdbcType=SMALLINT},
+      </if>
+      <if test="jobid != null">
+       jobid=#{jobid,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <where>
+    	<if test="id != null">
+	        id = #{id,jdbcType=VARCHAR}
+	    </if>
+    </where>
+    
+  </update>
+  
+  <update id="updateLog">
+  	update rscipc_cut_job_log set cut_id=#{newid} where cut_id=#{oldid}
+  </update>
+  
+  <insert id="insertLog" parameterType="CutJobLog">
+    insert into rscipc_cut_job_log
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="inPath != null">
+        in_path,
+      </if>
+      <if test="mapId != null">
+        map_id,
+      </if>
+      <if test="maxLayers != null">
+        max_layers,
+      </if>
+      <if test="status != null">
+        "status",
+      </if>
+      <if test="jobid != null">
+        jobid,
+      </if>
+      <if test="operationUserId != null">
+        operation_user_id,
+      </if>
+      <if test="acceptTime != null">
+        accept_time,
+      </if>
+      <if test="startTime != null">
+        start_time,
+      </if>
+      <if test="endTime != null">
+        end_time,
+      </if>
+      <if test="isCover != null">
+        is_cover,
+      </if>
+      <if test="cutType != null">
+        cut_type,
+      </if>
+      <if test="log != null">
+        log,
+      </if>
+      <if test="minLayers != null">
+        min_layers,
+      </if>
+      <if test="geowebcacheUrl != null">
+        geowebcache_url,
+      </if>
+      <if test="realTime != null">
+        real_time,
+      </if>
+      <if test="cutId != null">
+        cut_id,
+      </if>
+      <if test="jobName != null">
+        job_name,
+      </if>
+      <if test="progress != null">
+        progress,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=CHAR},
+      </if>
+      <if test="inPath != null">
+        #{inPath,jdbcType=VARCHAR},
+      </if>
+      <if test="mapId != null">
+        #{mapId,jdbcType=VARCHAR},
+      </if>
+      <if test="maxLayers != null">
+        #{maxLayers,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="jobid != null">
+        #{jobid,jdbcType=VARCHAR},
+      </if>
+      <if test="operationUserId != null">
+        #{operationUserId,jdbcType=CHAR},
+      </if>
+      <if test="acceptTime != null">
+        #{acceptTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="startTime != null">
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null">
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isCover != null">
+        #{isCover,jdbcType=BIT},
+      </if>
+      <if test="cutType != null">
+        #{cutType,jdbcType=SMALLINT},
+      </if>
+      <if test="log != null">
+        #{log,jdbcType=VARCHAR},
+      </if>
+      <if test="minLayers != null">
+        #{minLayers,jdbcType=VARCHAR},
+      </if>
+      <if test="geowebcacheUrl != null">
+        #{geowebcacheUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="realTime != null">
+        #{realTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cutId != null">
+        #{cutId,jdbcType=VARCHAR},
+      </if>
+       <if test="jobName != null">
+        #{jobName,jdbcType=VARCHAR},
+      </if>
+      <if test="progress != null">
+        #{progress,jdbcType=NUMERIC},
+      </if>
+    </trim>
+  </insert>
+</mapper>

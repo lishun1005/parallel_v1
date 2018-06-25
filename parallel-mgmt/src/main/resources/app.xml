@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:aop="http://www.springframework.org/schema/aop" 
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+
+
+	<import resource="app-shiro.xml"></import>
+	<import resource="app-redis.xml"></import>
+	<import resource="app-dubbo.xml"></import>
+
+
+	<bean class="com.rscloud.ipc.utils.SpringApplication"></bean>
+
+	<bean id="redisSentinelConfiguration" class="org.springframework.data.redis.connection.RedisSentinelConfiguration"></bean>
+
+
+
+
+	<!-- 这种加载方式可以在代码中通过@Value注解进行注入 -->
+	<util:properties id="applicationProperty" location="classpath:app.${spring.profiles.active}.properties" />
+
+	<util:properties id="fixparamProperty" location="classpath:fixparam.properties" />
+
+
+	<bean id="controllerAop" class="com.rscloud.ipc.aop.ControllerAop"></bean>
+	<aop:config>
+		<aop:aspect  ref="controllerAop">
+			<aop:pointcut id="pointcut"
+						  expression="
+						     execution(public com.rscloud.ipc.rpc.api.result.ResultBean com.rscloud.ipc.contrller.*.*(..))
+						  || execution(public com.rscloud.ipc.rpc.api.result.ResultBean com.rscloud.ipc.rest.*.*(..))"></aop:pointcut>
+			<aop:around method="handlerControllerMethod" pointcut-ref="pointcut" ></aop:around>
+		</aop:aspect>
+	</aop:config>
+</beans>

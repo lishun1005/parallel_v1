@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rsclouds.gtparallel.dao.OptimalModelDao" >
+  <resultMap id="beanMap" type="OptimalModel" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIME" />
+    <result column="is_del" property="isDel" jdbcType="SMALLINT" />
+  </resultMap>
+  <sql id="column_name" >
+    id, "name", create_time, is_del
+  </sql>
+  <select id="queryAll" resultMap="beanMap">
+    select
+    <include refid="column_name" />
+    from rsipc_optimal_model rom
+    <where>
+      <if test="keyword!=null and keyword!=''">
+        <bind name="keyword" value="'%' + keyword + '%'" />
+        and (rom.name like #{keyword})
+      </if>
+      and rom.is_del=0
+    </where>
+  </select>
+
+  <select id="queryById" resultMap="beanMap">
+    select
+    <include refid="column_name" />
+    from rsipc_optimal_model rom
+    <where>
+      id = #{id}
+      and rom.is_del=0
+    </where>
+  </select>
+
+  <insert id="insertBatch" parameterType="java.util.List">
+    insert into rsipc_model_algorithm (model_id,algorithm_id,ordering)
+    values
+    <foreach collection="list" item="item" index="index" separator="," >
+      (#{item.modelId},#{item.algorithmId},#{item.ordering})
+    </foreach>
+  </insert>
+  <select id="queryOptimalModelByModelId" resultType="map">
+      select a.id as modelId,c.id as algorithmId,b.ordering,c.display_name as displayName,c.name
+      from rsipc_optimal_model a
+      LEFT JOIN rsipc_model_algorithm b on a.id = b.model_id
+      LEFT JOIN rsipc_algorithm c on c.id = b.algorithm_id
+      where a.id = #{id} and c.id is not null
+      ORDER BY b.ordering asc
+  </select>
+  <delete id="deletemodelAlgorithmByModelId">
+    DELETE from rsipc_model_algorithm where model_id = #{modelId}
+  </delete>
+
+  <insert id="insert" parameterType="OptimalModel" >
+    insert into rsipc_optimal_model
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        "name",
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="isDel != null" >
+        is_del,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIME},
+      </if>
+      <if test="isDel != null" >
+        #{isDel,jdbcType=SMALLINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="update" parameterType="OptimalModel" >
+    update rsipc_optimal_model
+    <set >
+      <if test="name != null" >
+        "name" = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIME},
+      </if>
+      <if test="isDel != null" >
+        is_del = #{isDel,jdbcType=SMALLINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>
